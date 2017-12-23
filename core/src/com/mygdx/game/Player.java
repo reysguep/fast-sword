@@ -1,6 +1,5 @@
 package com.mygdx.game;
 
-import java.awt.Point;
 
 /**
  *
@@ -8,15 +7,22 @@ import java.awt.Point;
  */
 public abstract class Player extends Character {
 
-    public Player(int health, int maxHealth, int strength, Point position, float pedaladasMinimas, String folderAnim) {
-        super(health, maxHealth, strength, position, "player/" + folderAnim);
+    public Player(String nome, int maxHealth, int strength, float pedaladasMinimas, String folder) {
+        super(nome, maxHealth, strength, "player/" + folder);
         pedaladasDadas = 0;
         this.pedaladasMinimas = pedaladasMinimas;
     }
 
-    protected float pedaladasDadas;
-    protected float pedaladasMinimas;
+    private float pedaladasDadas;
+    private float pedaladasMinimas;
 
+    @Override
+    public void attack(Character target){
+        super.attack(target);
+        pedaladasDadas -= pedaladasMinimas;
+    }
+    
+    
     public void upgradeStrength() {
         strength *= (120 / 100);
     }
@@ -29,5 +35,12 @@ public abstract class Player extends Character {
         pedaladasMinimas *= (80/100);
     }
     
+    public void contarPedalada(float nPedaladas){
+        pedaladasDadas += nPedaladas;
+    }
+    
+    public boolean canAttack(){
+        return pedaladasDadas >= pedaladasMinimas;
+    }
     
 }

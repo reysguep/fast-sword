@@ -1,0 +1,3 @@
+4/0.1f/idle
+10/0.1f/attacking
+9/0.1f/dying

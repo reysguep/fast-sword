@@ -1,9 +1,12 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import java.awt.Point;
+import libgdxUtils.AnimatedSprite;
+import libgdxUtils.AnimationCode;
+import libgdxUtils.MultiAnimatedSprite;
+import libgdxUtils.TextureUtil;
 
 /**
  *
@@ -11,26 +14,48 @@ import java.awt.Point;
  */
 public abstract class Character {
 
-    public Character(int health, int maxHealth, int strength, Point position, String folderAnim) {
-        this.health = health;
+    public Character(String nome, int maxHealth, int strength, String folder) {
         this.maxHealth = maxHealth;
+        this.health = maxHealth;
         this.strength = strength;
-        this.position = position;
-        idleAnim = GdxUtil.getAnimationAt("Animations/" + folderAnim + "/idle", true, false);
+        this.animations = TextureUtil.createAnimationsCharacter("Animations/" + folder);
+        this.nome = nome;
     }
 
     protected int health;
     protected int maxHealth;
     protected int strength;
-    protected final Point position;
 
-    private final Animation<TextureRegion> idleAnim;
-    private Animation<TextureRegion> attackingAnim;
-    private Animation<TextureRegion> dyingAnim;
-    protected Animation<TextureRegion> actualAnim;
+    private final String nome;
 
-    protected void atacar() {
+    public final MultiAnimatedSprite animations;
+
+    public boolean isDead() {
+        return health <= 0;
     }
+
+    private void die() {
+        health = 0;
+        animations.startAnimation(AnimationCode.DYING);
+        System.out.println(nome + " morreu!");
+    }
+
+    public void attack(Character target) {
+        if (!isDead()) {
+            System.out.println(nome + " atacou " + target.getNome());
+            target.beAttacked(strength);
+            this.animations.startAnimation(AnimationCode.ATTACKING);
+        }
+    }
+
+    public void beAttacked(int damage) {
+        health -= damage;
+        if (health <= 0) {
+            die();
+        }
+    }
+
+    public abstract boolean canAttack();
 
     public int getHealth() {
         return health;
@@ -44,12 +69,36 @@ public abstract class Character {
         return strength;
     }
 
-    public void draw(Batch batch, float stateTime) {
-        TextureRegion currentFrame = idleAnim.getKeyFrame(stateTime, true);
-        batch.draw(currentFrame, position.x, position.y);
+    public void draw(Batch batch) {
+        animations.draw(batch);
     }
-    
-    public void setIdleAnimation(String folder){
-        GdxUtil.getAnimationAt(folder);
+
+    public void setPosition(int x, int y) {
+        animations.setPosition(x, y);
+    }
+
+    public void setSize(int width, int height) {
+        animations.setSize(width, height);
+    }
+
+    public void setAnimation(String animation) {
+        animations.startAnimation(animation);
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void flipAllAnimations(boolean flipX, boolean flipY) {
+        AnimatedSprite as;
+
+        as = new AnimatedSprite(animations.getAnimation(AnimationCode.IDLE));
+        as.flipFrames(flipX, flipY);
+
+        as = new AnimatedSprite(animations.getAnimation(AnimationCode.ATTACKING));
+        as.flipFrames(flipX, flipY);
+
+        as = new AnimatedSprite(animations.getAnimation(AnimationCode.DYING));
+        as.flipFrames(flipX, flipY);
     }
 }

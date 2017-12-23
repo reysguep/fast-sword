@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import java.util.Random;
+import libgdxUtils.AnimatedSprite;
 
 /**
  *
@@ -12,16 +13,17 @@ import java.util.Random;
 public class Background {
 
     public Background() {
-        TextureRegion background[];
+        Animation<TextureRegion> animation;
         Random random = new Random();
         int sortedNumber = random.nextInt(5);
         animation = GdxUtil.getAnimationAt("Animations/backgrounds/fbg" + sortedNumber);
+        animacao = new AnimatedSprite(animation);
+        animacao.setSize(1280, 720);
     }
 
-    private final Animation<TextureRegion> animation;
+    private final AnimatedSprite animacao;
 
-    public void draw(Batch batch, float stateTime) {
-        TextureRegion currentFrame = animation.getKeyFrame(stateTime, true);
-        batch.draw(currentFrame, 0, 0, 1280, 720);
+    public void draw(Batch batch) {
+        animacao.draw(batch);
     }
 }

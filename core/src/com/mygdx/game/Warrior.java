@@ -1,13 +1,13 @@
 package com.mygdx.game;
 
-import java.awt.Point;
-
 /**
  *
  * @author reysguep
  */
-public class Warrior extends Player{
-    public Warrior(Point pt){
-        super(100, 100, 100, pt, 5, "warrior1");
+public class Warrior extends Player {
+
+    public Warrior(String nome) {
+        super(nome, 100, 5, 5, "warrior");
     }
 }
+    

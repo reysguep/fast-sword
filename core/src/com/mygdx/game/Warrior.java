@@ -6,8 +6,12 @@ package com.mygdx.game;
  */
 public class Warrior extends Player {
 
+    public Warrior(br.cefetmg.move2play.model.Player player) {
+        super(250, 65, 15, "warrior", player);
+    }
+    
     public Warrior(String nome) {
-        super(nome, 100, 5, 5, "warrior");
+        super(250, 65, 15, "warrior", nome);
     }
 }
     

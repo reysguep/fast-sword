@@ -1,77 +1,123 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import java.util.ArrayList;
+import br.cefetmg.move2play.game.Move2PlayGame;
+import br.cefetmg.move2play.settings.GameSettings;
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Screen;
 
-public class MyGdxGame extends ApplicationAdapter {
+public class MyGdxGame extends Game implements Move2PlayGame {
 
-    SpriteBatch batch;
-    Background background;
-    Warrior warrior1;
-    Gunman gunwoman;
-    Skeleton skeleton;
-    float stateTime;
-    FreeTypeFontGenerator freeType;
-    TelaDeBatalha tdb;
-
+    public Move2PlayGame eventHandler;
+    private final GameSettings gs;
+    private Screen previousScreen = null;
+    
+    //private Assets resources;
+    
+    public MyGdxGame(){
+        eventHandler = this;
+        gs = new GameSettings(MyGdxGame.class);
+        //gs.loadSettings();
+    }
+    
     @Override
     public void create() {
-        batch = new SpriteBatch();
-        warrior1 = new Warrior("Lancelot");
-        gunwoman = new Gunman("Ellie");
-        skeleton = new Skeleton();
-        ArrayList<Player> jogadores = new ArrayList<Player>();
-        ArrayList<Enemy> inimigos = new ArrayList<Enemy>();
-        
-        
-        warrior1.setPosition(50, 70);
-        warrior1.setSize(400, 400);
-        
-        gunwoman.setPosition(200, 70);
-        gunwoman.setSize(400, 400);
-        
-        skeleton.setPosition(800, 100);
-        skeleton.setSize(400, 600);
-        skeleton.flipAllAnimations(true, false); 
-        
-        jogadores.add(warrior1);
-        jogadores.add(gunwoman);
-        inimigos.add(skeleton);
-        
-        tdb = new TelaDeBatalha(jogadores, inimigos);
+        setScreen(new SplashScreen(this));
+    }
+    
+    public GameSettings getSettings() {
+        return gs;
     }
 
     @Override
     public void render() {
-        tdb.checarCondicoes();
-        startBatch(); // Set and starts the batch //
-
-        tdb.draw(batch);
-
-        batch.end(); // Ends the batch //
+        super.render();
+        
+        if(previousScreen != null){
+            previousScreen.dispose();
+            previousScreen = null;
+        } 
+    }
+    
+    @Override
+    public void setScreen(Screen screen){
+        previousScreen = this.screen;
+        super.setScreen(screen);
     }
 
     @Override
     public void dispose() {
-        batch.dispose();
+        super.dispose();
     }
-
-    public void update() {
-        //tempoDaAnimacao += Gdx.graphics.getDeltaTime();
-
-    }
-
-    private void startBatch() {
-        Gdx.gl.glClearColor(1, 1, 1, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        stateTime += Gdx.graphics.getDeltaTime();
-        batch.begin();
-    }
-
     
+    @Override
+    public void resize(int width, int height) {
+        super.resize(width, height);
+    }
 
+    @Override
+    public void pause() {
+        super.pause();
+    }
+
+    @Override
+    public void resume() {
+        super.resume();
+    }
+
+    @Override
+    public void startMatch() {
+        if(eventHandler!=this)
+            eventHandler.startMatch();
+        else
+            System.out.println("StartMatch from Main");
+    }
+
+    @Override
+    public void finishMatch() {
+        if(eventHandler!=this)
+            eventHandler.finishMatch();
+        else
+            System.out.println("AddPlayer from Main");
+    }
+
+    @Override
+    public void addPlayer(br.cefetmg.move2play.model.Player player) {
+        if(eventHandler!=this)
+            eventHandler.addPlayer(player);
+        else
+            System.out.println("AddPlayer from Main");
+    }
+
+    @Override
+    public void removePlayer(br.cefetmg.move2play.model.Player player) {
+        if(eventHandler!=this)
+            eventHandler.removePlayer(player);
+        else
+            System.out.println("RemomvePlayer from Main");
+    }
+
+    @Override
+    public void initGame() {
+        if(eventHandler!=this)
+            eventHandler.initGame();
+        else
+            System.out.println("InitGame from Main");
+    }
+
+    @Override
+    public void closeGame() {
+        if(eventHandler!=this)
+            eventHandler.closeGame();
+        else
+            System.out.println("ExitGame from Main");
+    }
+
+    @Override
+    public void move(String uuid, int i) {
+        if(eventHandler!=this)
+            eventHandler.move(uuid,i);
+        else
+            System.out.println("Move from Main");
+    }
 }
+

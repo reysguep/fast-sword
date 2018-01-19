@@ -45,7 +45,9 @@ project(":desktop") {
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-        
+        //compile "com.badlogicgames.gdxvideo:gdx-video-desktop:0.0.1"
+        //compile "com.badlogicgames.gdxvideo:gdx-video-platform:0.0.1:natives-desktop"
+        apply plugin: "java"
     }
 }
 
@@ -54,8 +56,10 @@ project(":core") {
 
 
     dependencies {
+        //compile "com.badlogicgames.gdxvideo:gdx-video:0.0.1"
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+        compile fileTree(dir: 'assets/libs', include: '*.jar')
         
     }
 }

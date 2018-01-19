@@ -1,0 +1,20 @@
+﻿{
+	"gameName":"Fast Sword",
+	"UUID":"",
+	"version":",
+	"description":"Jogo no qual você deve pedalar com sua maior intensidade para puxar a corda para seu time","instructions":"Apenas pedale o mais rapido que consegue",
+	"fullClassName":"com.mygdx.game.desktop.DesktopLauncher",
+	"minPlayers":1,
+	"maxPlayers":4,
+	"coverImage":"ss1.png",
+	"images":["ss1.png"],
+	"allowNewPlayersWhileRunning":false,
+	"defaultGameDurationIndex":0,	
+	"gameDurations":[15,10,20,30],
+	"gameSpecificSettings":[
+		{"attribute":"width","type":"int","value":"1280","readOnly":false,"description":"Largura da tela"},
+		{"attribute":"height","type":"int","value":"720","readOnly":false,"description":"Altura da tela"},
+                {"attribute":"FPS","type":"int","value":"30","readOnly":false,"description":"Quadros por segundo"},
+		{"attribute":"amountPlayers","type":"int","value":"4","readOnly":false,"description":"Quantidade de jogadores"},		
+	]
+}

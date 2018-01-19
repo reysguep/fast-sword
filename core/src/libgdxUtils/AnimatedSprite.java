@@ -20,6 +20,8 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import java.io.Serializable;
+import com.badlogic.gdx.utils.JsonValue;
 
 /**
  * An {@link AnimatedSprite} holds an {@link Animation} and sets the
@@ -35,7 +37,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
  *
  * @author dermetfan
  */
-public class AnimatedSprite extends Sprite {
+public class AnimatedSprite extends Sprite{
 
     /**
      * the {@link Animation} to display

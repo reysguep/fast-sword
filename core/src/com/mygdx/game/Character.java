@@ -1,8 +1,6 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import libgdxUtils.AnimatedSprite;
 import libgdxUtils.AnimationCode;
 import libgdxUtils.MultiAnimatedSprite;
@@ -14,21 +12,21 @@ import libgdxUtils.TextureUtil;
  */
 public abstract class Character {
 
-    public Character(String nome, int maxHealth, int strength, String folder) {
+    public Character(String name, int maxHealth, int strength, String folder) {
         this.maxHealth = maxHealth;
         this.health = maxHealth;
         this.strength = strength;
         this.animations = TextureUtil.createAnimationsCharacter("Animations/" + folder);
-        this.nome = nome;
+        this.name = name;
     }
 
     protected int health;
     protected int maxHealth;
     protected int strength;
 
-    private final String nome;
+    private final String name;
 
-    public final MultiAnimatedSprite animations;
+    private final MultiAnimatedSprite animations;
 
     public boolean isDead() {
         return health <= 0;
@@ -37,12 +35,14 @@ public abstract class Character {
     private void die() {
         health = 0;
         animations.startAnimation(AnimationCode.DYING);
-        System.out.println(nome + " morreu!");
+        System.out.println(name + " morreu!");
     }
 
-    public void attack(Character target) {
+    public abstract void attack(Character target);
+
+    protected void msgAttack(Character target) {
         if (!isDead()) {
-            System.out.println(nome + " atacou " + target.getNome());
+            System.out.println(name + " atacou " + target.getName());
             target.beAttacked(strength);
             this.animations.startAnimation(AnimationCode.ATTACKING);
         }
@@ -69,8 +69,9 @@ public abstract class Character {
         return strength;
     }
 
-    public void draw(Batch batch) {
+    public void draw(SpriteBatch batch) {
         animations.draw(batch);
+
     }
 
     public void setPosition(int x, int y) {
@@ -81,12 +82,42 @@ public abstract class Character {
         animations.setSize(width, height);
     }
 
+    public void resizeLockHeight(int height) {
+        float reason = height / getHeight();
+        int width = (int) (getWidth() * reason);
+
+        setSize(width, height);
+    }
+
+    public void resizeLockWidth(int width) {
+        float reason = width / getWidth();
+        int height = (int) (getHeight() * reason);
+
+        setSize(width, height);
+    }
+
     public void setAnimation(String animation) {
         animations.startAnimation(animation);
     }
 
-    public String getNome() {
-        return nome;
+    public String getName() {
+        return name;
+    }
+
+    public int getX() {
+        return (int) animations.getX();
+    }
+
+    public int getY() {
+        return (int) animations.getY();
+    }
+
+    public int getHeight() {
+        return (int) animations.getHeight();
+    }
+
+    public int getWidth() {
+        return (int) animations.getWidth();
     }
 
     public void flipAllAnimations(boolean flipX, boolean flipY) {
@@ -100,5 +131,13 @@ public abstract class Character {
 
         as = new AnimatedSprite(animations.getAnimation(AnimationCode.DYING));
         as.flipFrames(flipX, flipY);
+    }
+
+    public MultiAnimatedSprite getAnimations() {
+        return animations;
+    }
+
+    public boolean compareAnimation(String animation) {
+        return animations.getAnimation() == animations.getAnimation(animation);
     }
 }

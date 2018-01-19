@@ -6,6 +6,6 @@ package com.mygdx.game;
  */
 public class Skeleton extends Enemy{
     public Skeleton(){
-        super("Skeleton", 100, 60, 5, "skeleton");
+        super("Skeleton", 600, 30, 3.5f, "skeleton");
     }
 }

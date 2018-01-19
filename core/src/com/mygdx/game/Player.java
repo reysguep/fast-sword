@@ -1,28 +1,37 @@
 package com.mygdx.game;
 
-
 /**
  *
  * @author reysguep
  */
+
 public abstract class Player extends Character {
 
-    public Player(String nome, int maxHealth, int strength, float pedaladasMinimas, String folder) {
-        super(nome, maxHealth, strength, "player/" + folder);
+    public Player(int maxHealth, int strength, int pedaladasMinimas, String folder, br.cefetmg.move2play.model.Player player) {
+        super(player.getName(), maxHealth, strength, "player/" + folder);
         pedaladasDadas = 0;
         this.pedaladasMinimas = pedaladasMinimas;
+        uuid = player.getUUID();
+    }
+    
+    public Player(int maxHealth, int strength, int pedaladasMinimas, String folder, String name) {
+        super(name, maxHealth, strength, "player/" + folder);
+        pedaladasDadas = 0;
+        this.pedaladasMinimas = pedaladasMinimas;
+        uuid = "1111";
     }
 
-    private float pedaladasDadas;
-    private float pedaladasMinimas;
+    private int pedaladasDadas;
+    private int pedaladasMinimas;
+
+    private final String uuid;
 
     @Override
-    public void attack(Character target){
-        super.attack(target);
+    public void attack(Character target) {
+        msgAttack(target);
         pedaladasDadas -= pedaladasMinimas;
     }
-    
-    
+
     public void upgradeStrength() {
         strength *= (120 / 100);
     }
@@ -32,15 +41,20 @@ public abstract class Player extends Character {
     }
 
     public void upgradeSpeed() {
-        pedaladasMinimas *= (80/100);
+        pedaladasMinimas *= (80 / 100);
     }
-    
-    public void contarPedalada(float nPedaladas){
+
+    public void contarPedalada(float nPedaladas) {
         pedaladasDadas += nPedaladas;
     }
-    
-    public boolean canAttack(){
+
+    @Override
+    public boolean canAttack() {
         return pedaladasDadas >= pedaladasMinimas;
     }
-    
+
+    public String getUuid() {
+        return uuid;
+    }
+
 }

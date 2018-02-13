@@ -1,10 +1,18 @@
-package com.mygdx.game;
+package com.mygdx.game.Screens;
 
 import br.cefetmg.move2play.game.Move2PlayGame;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.mygdx.game.Background;
+import com.mygdx.game.Characters.Character;
+import com.mygdx.game.Characters.Enemy;
+import com.mygdx.game.Characters.Gunman;
+import com.mygdx.game.MyGdxGame;
+import com.mygdx.game.Characters.Player;
+import com.mygdx.game.Team;
+import com.mygdx.game.Characters.Warrior;
 import java.util.ArrayList;
 import java.util.Random;
 import libgdxUtils.AnimationCode;
@@ -31,6 +39,25 @@ public class BattleScreen implements Screen, Move2PlayGame {
     private final MyGdxGame game;
     private SpriteBatch batch;
 
+    @Override
+    public void show() {
+
+        teamB = new Team('b');
+        teamB.addMember(new Enemy("Skeleton", 1000, 20, 3.0f, "blob"));
+        allCharacters = new ArrayList<Character>();
+        
+        allCharacters.addAll(teamA);
+        allCharacters.addAll(teamB);
+
+        batch = new SpriteBatch();
+
+        fundo = new Background();
+        drawing = new DrawingCharacter(batch);
+
+        game.eventHandler = this;
+        Gdx.input.setInputProcessor(new KeyboardUtil(this));
+    }
+    
     public void checarCondicoes() {
         Random random = new Random();
         int targetNumber;
@@ -50,21 +77,22 @@ public class BattleScreen implements Screen, Move2PlayGame {
                     }
                 }
 
-                if (personagem.canAttack() && !targets.isEmpty()) {
+                if (personagem.canAttack()) {
 
-                    boolean atacou = false;
+                    boolean naoAtacou = true;
 
-                    do {
+                    while (naoAtacou && !targets.isEmpty()) { //Enquanto não atacou e a lista de alvos não é vazia
+                        
                         targetNumber = random.nextInt(targets.size());
-                        target = (Character) targets.get(targetNumber);
+                        target = targets.get(targetNumber);
 
-                        if (!target.isDead()) {
+                        if (!target.isDead()) { //Se o alvo não está morto
                             personagem.attack(target);
-                            atacou = true;
+                            naoAtacou = false;
                         } else {
                             targets.remove(target);
                         }
-                    } while (!atacou && !targets.isEmpty());
+                    } 
                 }
             }
         }
@@ -75,7 +103,7 @@ public class BattleScreen implements Screen, Move2PlayGame {
     public void dispose() {
         drawing.dispose();
         batch.dispose();
-        
+
     }
 
     @Override
@@ -101,35 +129,22 @@ public class BattleScreen implements Screen, Move2PlayGame {
         return null;
     }
 
-    @Override
-    public void show() {
-        
-        teamB = new Team('b');
-        allCharacters = new ArrayList<Character>();
-        allCharacters.addAll(teamA);
-        teamB.addMember(new Skeleton());
-        
-        batch = new SpriteBatch();
-
-        fundo = new Background();
-        drawing = new DrawingCharacter(batch);
-        
-        game.eventHandler = this;
-        Gdx.input.setInputProcessor(new KeyboardUtil(this));
-    }
+    
 
     @Override
     public void render(float f) {
+        checarCondicoes();
+        
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
-        
+
         fundo.draw(batch);
 
         for (Character personagem : allCharacters) {
             drawing.draw(personagem);
         }
-        
+
         batch.end();
     }
 

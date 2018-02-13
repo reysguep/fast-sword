@@ -1,5 +1,6 @@
 package com.mygdx.game;
 
+import com.mygdx.game.Characters.Character;
 import java.util.ArrayList;
 
 /**
@@ -43,7 +44,7 @@ public class Team extends ArrayList<Character>{
         } else {
             switch(nMembers){
                 case 1:
-                    x = 160 * 7;
+                    x = 160 * 6;
                     break;
                 case 2:
                     x = 160 * 6;

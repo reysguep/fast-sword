@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.mygdx.game.Screens;
 
 import br.cefetmg.move2play.game.Move2PlayGame;
 import com.badlogic.gdx.Gdx;
@@ -12,6 +12,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.mygdx.game.Characters.Gunman;
+import com.mygdx.game.MyGdxGame;
+import com.mygdx.game.Characters.Player;
+import com.mygdx.game.Team;
+import com.mygdx.game.Characters.Warrior;
 import java.util.Random;
 
 /**

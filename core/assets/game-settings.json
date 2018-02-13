@@ -8,7 +8,7 @@
 	"maxPlayers":4,
 	"coverImage":"ss1.png",
 	"images":["ss1.png"],
-	"allowNewPlayersWhileRunning":false,
+	"allowNewPlayersWhileRunning":true,
 	"defaultGameDurationIndex":0,	
 	"gameDurations":[15,10,20,30],
 	"gameSpecificSettings":[

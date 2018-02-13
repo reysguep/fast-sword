@@ -1,4 +1,6 @@
-package com.mygdx.game;
+package com.mygdx.game.Characters;
+
+import com.mygdx.game.Characters.Character;
 
 /**
  *
@@ -28,7 +30,7 @@ public abstract class Player extends Character {
 
     @Override
     public void attack(Character target) {
-        msgAttack(target);
+        super.attackMessage(target);
         pedaladasDadas -= pedaladasMinimas;
     }
 
@@ -57,4 +59,11 @@ public abstract class Player extends Character {
         return uuid;
     }
 
+    @Override
+    public float getProgress(){
+        float progress;
+        
+        progress = (float)pedaladasDadas / pedaladasMinimas; // 1 = pode atacar
+        return progress;
+    }
 }

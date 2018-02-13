@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.mygdx.game.Characters;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import libgdxUtils.AnimatedSprite;
@@ -11,7 +11,7 @@ import libgdxUtils.TextureUtil;
  * @author reysguep
  */
 public abstract class Character {
-
+    
     public Character(String name, int maxHealth, int strength, String folder) {
         this.maxHealth = maxHealth;
         this.health = maxHealth;
@@ -24,7 +24,7 @@ public abstract class Character {
     protected int maxHealth;
     protected int strength;
 
-    private final String name;
+    public String name;
 
     private final MultiAnimatedSprite animations;
 
@@ -39,13 +39,11 @@ public abstract class Character {
     }
 
     public abstract void attack(Character target);
-
-    protected void msgAttack(Character target) {
-        if (!isDead()) {
-            System.out.println(name + " atacou " + target.getName());
-            target.beAttacked(strength);
-            this.animations.startAnimation(AnimationCode.ATTACKING);
-        }
+    
+    protected void attackMessage(Character target){
+        System.out.println(name + " atacou " + target.getName());
+        target.beAttacked(strength);
+        this.animations.startAnimation(AnimationCode.ATTACKING);
     }
 
     public void beAttacked(int damage) {
@@ -64,7 +62,7 @@ public abstract class Character {
     public int getMaxHealth() {
         return maxHealth;
     }
-
+    
     public int getStrength() {
         return strength;
     }
@@ -140,4 +138,6 @@ public abstract class Character {
     public boolean compareAnimation(String animation) {
         return animations.getAnimation() == animations.getAnimation(animation);
     }
+    
+    public abstract float getProgress();
 }

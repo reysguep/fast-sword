@@ -1,5 +1,6 @@
-package com.mygdx.game;
+package com.mygdx.game.Screens;
 
+import com.mygdx.game.Screens.WaitingScreen;
 import br.cefetmg.move2play.game.Move2PlayGame;
 import br.cefetmg.move2play.model.Player;
 import com.badlogic.gdx.Gdx;
@@ -8,7 +9,11 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.google.gson.Gson;
+import com.mygdx.game.MyGdxGame;
 import libgdxUtils.AnimatedSprite;
+import libgdxUtils.EnemyPreset;
+import libgdxUtils.FileUtil;
 import libgdxUtils.VideoUtil;
 
 /**
@@ -21,6 +26,20 @@ public class SplashScreen implements Screen, Move2PlayGame {
         this.game = game;
         animationSplash = new AnimatedSprite(VideoUtil.imageSequenceToAnimation("Animations/splash", 24));
         
+        EnemyPreset ep = new EnemyPreset();
+        Gson gson = new Gson();
+        
+        ep.name = "Skeleton1";
+        ep.fileName = "skeleton";
+        ep.maxHealth = 5000;
+        ep.strength = 25;
+        ep.timeToAttack = 3.5f;
+        ep.width = 100;
+        ep.height = 200;
+        
+        String tst = gson.toJson(ep);
+        
+        FileUtil.writeString(tst);
     }
 
     private final MyGdxGame game;
@@ -45,7 +64,7 @@ public class SplashScreen implements Screen, Move2PlayGame {
 
     @Override
     public void render(float delta) {
-        if (TimeUtils.timeSinceMillis(time) < 2500) {
+        if (! animationSplash.isAnimationFinished()) {
 
             Gdx.gl.glClearColor(1, 1, 1, 1);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);

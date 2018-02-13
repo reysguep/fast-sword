@@ -7,38 +7,30 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
-import com.mygdx.game.Character;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.mygdx.game.Characters.Character;
+import com.mygdx.game.Characters.Player;
 
 /**
  *
  * @author reysguep
  */
 public class DrawingCharacter {
-
-    private Character character;
     
     private final SpriteBatch batch;
-
-    FreeTypeFontGenerator generatorHealth;
-    FreeTypeFontParameter parameterHealth;
-    BitmapFont fontHealth;
 
     FreeTypeFontGenerator generatorName;
     FreeTypeFontParameter parameterName;
     BitmapFont fontName;
+    
+    ShapeRenderer rectangle;
     
     GlyphLayout layout = new GlyphLayout();
 
     public DrawingCharacter(SpriteBatch batch) {
         this.batch = batch;
         
-        generatorHealth = new FreeTypeFontGenerator(Gdx.files.internal("fonts/alterebro-pixel-font.ttf"));
-        parameterHealth = new FreeTypeFontParameter();
-        parameterHealth.size = 30;
-        parameterHealth.borderWidth = 4;
-        fontHealth = generatorHealth.generateFont(parameterHealth);
-        fontHealth.setColor(Color.RED);
-
+        rectangle = new ShapeRenderer();
         generatorName = new FreeTypeFontGenerator(Gdx.files.internal("fonts/VeniceClassic.ttf"));
         parameterName = new FreeTypeFontParameter();
         parameterName.size = 35;
@@ -46,46 +38,48 @@ public class DrawingCharacter {
         fontName = generatorName.generateFont(parameterName);
     }
 
-    public void draw(Character chtr) {
-
-        this.character = chtr;
+    public void draw(Character character) {
         character.getAnimations().draw(batch);
-        drawHealth();
-        drawName();
+        drawName(character);
+        drawBars(character);
     }
 
-    private void drawHealth() {
-        int x, y;
-        float textWidth;
-
-        CharSequence text = character.getHealth() + " / " + character.getMaxHealth();
+    private void drawBars(Character character) {
+        int x, y, width;
         
-        layout.setText(fontHealth, text);
-        textWidth = layout.width;
         
-        x = character.getX() + (character.getWidth() / 2) - (int)(textWidth / 2);
+        x = character.getX() + (character.getWidth() / 2) - 50;
         y = character.getY() + character.getHeight();
         
-        fontHealth.draw(batch, text, x, y);
+        width = (int)(100.0f * character.getProgress());
+        
+        batch.draw(ColorsUtil.BLUE, x, y, width, 10);
+        
+        width = (character.getHealth() * 100) / character.getMaxHealth();
+        
+        y += 15;
+        batch.draw(ColorsUtil.RED, x, y, 100, 10);
+        batch.draw(ColorsUtil.GREEN, x, y, width, 10);
     }
 
-    private void drawName() {
+    private void drawName(Character character) {
         int x, y;
         float textWidth;
         
         CharSequence text = character.getName();
         
-        layout.setText(fontHealth, text);
+        layout.setText(fontName, text);
         textWidth = layout.width;
         
         x = character.getX() + (character.getWidth() / 2) - (int)(textWidth / 2);
-        y = character.getY() + character.getHeight() + 30;
+        y = character.getY() + character.getHeight() + 45;
         
         fontName.draw(batch, text, x, y);
     }
 
     public void dispose() {
-        generatorHealth.dispose();
         generatorName.dispose();
+        rectangle.dispose();
+        ColorsUtil.dispose();
     }
 }

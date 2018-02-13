@@ -3,8 +3,8 @@ package libgdxUtils;
 import br.cefetmg.move2play.game.Move2PlayGame;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
-import com.mygdx.game.BattleScreen;
-import com.mygdx.game.WaitingScreen;
+import com.mygdx.game.Screens.BattleScreen;
+import com.mygdx.game.Screens.WaitingScreen;
 
 /**
  *
@@ -46,10 +46,10 @@ public class KeyboardUtil implements InputProcessor {
             BattleScreen screen = (BattleScreen)screenM;
             switch (keycode) {
                 case Keys.I:
-                    screen.addPlayer("Lancelot");
+                    screen.move("Lancelot", 1);
                     break;
                 case Keys.O:
-                    screen.addPlayer("Elliot");
+                    screen.move("Elliot", 1);
                     break;
                 case Keys.K:
                     screen.removePlayer("Lancelot");

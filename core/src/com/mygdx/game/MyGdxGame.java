@@ -1,5 +1,6 @@
 package com.mygdx.game;
 
+import com.mygdx.game.Screens.SplashScreen;
 import br.cefetmg.move2play.game.Move2PlayGame;
 import br.cefetmg.move2play.settings.GameSettings;
 import com.badlogic.gdx.Game;

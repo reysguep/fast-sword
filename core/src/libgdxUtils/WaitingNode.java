@@ -2,7 +2,7 @@ package libgdxUtils;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
 import static libgdxUtils.VideoUtil.imageSequenceToAnimation;
-import com.mygdx.game.Character;
+import com.mygdx.game.Characters.Character;
 
 /**
  *
@@ -17,7 +17,7 @@ public class WaitingNode {
         star.setSize(30, 30);
     }
 
-    private final com.mygdx.game.Character character;
+    private final com.mygdx.game.Characters.Character character;
     private final AnimatedSprite star;
 
     public AnimatedSprite getStar(){

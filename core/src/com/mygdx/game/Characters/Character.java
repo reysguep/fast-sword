@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import libgdxUtils.AnimatedSprite;
 import libgdxUtils.AnimationCode;
 import libgdxUtils.MultiAnimatedSprite;
+import libgdxUtils.StatusCode;
 import libgdxUtils.TextureUtil;
 
 /**
@@ -11,20 +12,25 @@ import libgdxUtils.TextureUtil;
  * @author reysguep
  */
 public abstract class Character {
-    
+
     public Character(String name, int maxHealth, int strength, String folder) {
         this.maxHealth = maxHealth;
         this.health = maxHealth;
         this.strength = strength;
         this.animations = TextureUtil.createAnimationsCharacter("Animations/" + folder);
         this.name = name;
+        status = 1;
     }
 
     protected int health;
     protected int maxHealth;
     protected int strength;
 
-    public String name;
+    
+    private int status;
+    public int orgX, orgY;
+
+    public String name, team;
 
     private final MultiAnimatedSprite animations;
 
@@ -32,15 +38,9 @@ public abstract class Character {
         return health <= 0;
     }
 
-    private void die() {
-        health = 0;
-        animations.startAnimation(AnimationCode.DYING);
-        System.out.println(name + " morreu!");
-    }
-
     public abstract void attack(Character target);
-    
-    protected void attackMessage(Character target){
+
+    protected void attackMessage(Character target) {
         System.out.println(name + " atacou " + target.getName());
         target.beAttacked(strength);
         this.animations.startAnimation(AnimationCode.ATTACKING);
@@ -49,7 +49,7 @@ public abstract class Character {
     public void beAttacked(int damage) {
         health -= damage;
         if (health <= 0) {
-            die();
+            setStatus(StatusCode.DYING);
         }
     }
 
@@ -62,7 +62,7 @@ public abstract class Character {
     public int getMaxHealth() {
         return maxHealth;
     }
-    
+
     public int getStrength() {
         return strength;
     }
@@ -72,7 +72,7 @@ public abstract class Character {
 
     }
 
-    public void setPosition(int x, int y) {
+    public void setPosition(float x, float y) {
         animations.setPosition(x, y);
     }
 
@@ -102,12 +102,12 @@ public abstract class Character {
         return name;
     }
 
-    public int getX() {
-        return (int) animations.getX();
+    public float getX() {
+        return animations.getX();
     }
 
-    public int getY() {
-        return (int) animations.getY();
+    public float getY() {
+        return animations.getY();
     }
 
     public int getHeight() {
@@ -138,6 +138,35 @@ public abstract class Character {
     public boolean compareAnimation(String animation) {
         return animations.getAnimation() == animations.getAnimation(animation);
     }
-    
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+
+        switch (status) {
+            case StatusCode.WAITING:
+                setAnimation(AnimationCode.IDLE);
+                break;
+            case StatusCode.GOING:
+                setAnimation(AnimationCode.RUNNING);
+                break;
+            case StatusCode.ATTACKING:
+                setAnimation(AnimationCode.ATTACKING);
+                break;
+            case StatusCode.RETURNING:
+                setAnimation(AnimationCode.RUNNING);
+                animations.flipFrames(true, false);
+                break;
+            case StatusCode.DYING:
+                health = 0;
+                animations.startAnimation(AnimationCode.DYING);
+                System.out.println(name + " morreu!");
+                break;
+        }
+    }
+
     public abstract float getProgress();
 }

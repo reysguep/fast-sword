@@ -25,6 +25,7 @@ public abstract class Player extends Character {
 
     private int pedaladasDadas;
     private int pedaladasMinimas;
+    public static int width, height;
 
     private final String uuid;
 
@@ -65,5 +66,9 @@ public abstract class Player extends Character {
         
         progress = (float)pedaladasDadas / pedaladasMinimas; // 1 = pode atacar
         return progress;
+    }
+    
+    public float getPedaladasRestantes(){
+        return pedaladasMinimas - pedaladasDadas;
     }
 }

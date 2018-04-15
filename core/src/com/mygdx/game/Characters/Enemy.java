@@ -1,9 +1,6 @@
 package com.mygdx.game.Characters;
 
-import com.mygdx.game.Characters.Character;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.google.gson.Gson;
-import libgdxUtils.EnemyPreset;
 
 /**
  *
@@ -18,15 +15,6 @@ public class Enemy extends Character {
         this.timeToAttack = (long) (timeToAttack * 1000);
     }
 
-    public static Enemy jsonToEnemy(String fileName) {
-        Gson gson = new Gson();
-        EnemyPreset obj = gson.fromJson("Presets/" + fileName, EnemyPreset.class);
-        
-        Enemy enemy = new Enemy(obj.name, obj.maxHealth, obj.strength, obj.timeToAttack, obj.fileName);
-        enemy.setSize(obj.width, obj.height);
-        
-        return enemy;
-    }
 
     private final long timeToAttack;
     private long startTime;
@@ -42,15 +30,19 @@ public class Enemy extends Character {
         super.attackMessage(target);
         startTime = TimeUtils.millis();
     }
-    
+
     @Override
-    public float getProgress(){
+    public float getProgress() {
         float progress;
-        
-        if(!this.isDead()){
-        long elapsedTime = TimeUtils.timeSinceMillis(startTime);
-        progress = elapsedTime / timeToAttack;
-        } else{
+
+        if (!this.isDead()) {
+            long elapsedTime = TimeUtils.timeSinceMillis(startTime);
+            progress = (float)elapsedTime / timeToAttack;
+            if(progress >= 1){
+                startTime += elapsedTime - timeToAttack;
+                progress = 1;
+            }
+        } else {
             progress = 0;
         }
         return progress;

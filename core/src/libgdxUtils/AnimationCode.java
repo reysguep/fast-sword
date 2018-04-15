@@ -8,6 +8,7 @@ public class AnimationCode {
     public static final String DYING = "dying";
     public static final String ATTACKING = "attacking";
     public static final String IDLE = "idle";
+    public static final String RUNNING = "running";
     
     public static String getAnimationCode(String animation){
         if(animation.equalsIgnoreCase(DYING)){

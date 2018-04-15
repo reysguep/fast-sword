@@ -1,24 +1,29 @@
 package com.mygdx.game.Screens;
 
+import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenManager;
+import aurelienribon.tweenengine.equations.Linear;
 import br.cefetmg.move2play.game.Move2PlayGame;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.game.Background;
 import com.mygdx.game.Characters.Character;
-import com.mygdx.game.Characters.Enemy;
+//import com.mygdx.game.Characters.Enemy;
 import com.mygdx.game.Characters.Gunman;
 import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.Characters.Player;
 import com.mygdx.game.Team;
 import com.mygdx.game.Characters.Warrior;
+import com.mygdx.game.EnemyGenerator;
 import java.util.ArrayList;
 import java.util.Random;
-import libgdxUtils.AnimationCode;
 import libgdxUtils.DrawingCharacter;
-import static libgdxUtils.AnimationCode.*;
+import libgdxUtils.CharacterAccessor;
 import libgdxUtils.KeyboardUtil;
+import static libgdxUtils.StatusCode.*;
 
 /**
  *
@@ -31,72 +36,127 @@ public class BattleScreen implements Screen, Move2PlayGame {
         this.teamA = teamA;
     }
 
-    private final Team teamA;
-    private Team teamB;
-    private ArrayList<Character> allCharacters;
+    public Team teamA, teamB;
+    public ArrayList<Character> allCharacters;
     private Background fundo;
     private DrawingCharacter drawing;
     private final MyGdxGame game;
     private SpriteBatch batch;
+    private EnemyGenerator generator;
+    private Music music;
+    private static TweenManager tweenManager;
+    
+    private int battleStatus; // 0 = battle; 1 = transition; 2 = ...
 
     @Override
     public void show() {
+        tweenManager = new TweenManager();
+        Tween.setCombinedAttributesLimit(4);
+        Tween.registerAccessor(Character.class, new CharacterAccessor());
 
         teamB = new Team('b');
-        teamB.addMember(new Enemy("Skeleton", 1000, 20, 3.0f, "blob"));
         allCharacters = new ArrayList<Character>();
-        
+
         allCharacters.addAll(teamA);
-        allCharacters.addAll(teamB);
 
         batch = new SpriteBatch();
 
         fundo = new Background();
         drawing = new DrawingCharacter(batch);
 
+        generator = new EnemyGenerator(this);
+
         game.eventHandler = this;
         Gdx.input.setInputProcessor(new KeyboardUtil(this));
+
+        for (Character chr : teamA) {
+            chr.setSize(280, 350);
+        }
+    }
+
+    private void nextLevel(){
+        generator.newMatch();
     }
     
-    public void checarCondicoes() {
-        Random random = new Random();
+    private void update(float delta) {
+        tweenManager.update(delta);
+
+        final Random random = new Random();
         int targetNumber;
+        Character personagem;
         Character target;
 
-        for (Character personagem : allCharacters) {
-            Team targets;
-            if (teamA.contains(personagem)) {
-                targets = teamB;
-            } else {
-                targets = teamA;
-            }
-            if (!personagem.isDead()) {
-                if (personagem.compareAnimation(ATTACKING)) {
-                    if (personagem.getAnimations().getAnimation().isAnimationFinished(personagem.getAnimations().getTime())) {
-                        personagem.setAnimation(AnimationCode.IDLE);
-                    }
-                }
-
-                if (personagem.canAttack()) {
-
-                    boolean naoAtacou = true;
-
-                    while (naoAtacou && !targets.isEmpty()) { //Enquanto não atacou e a lista de alvos não é vazia
-                        
-                        targetNumber = random.nextInt(targets.size());
-                        target = targets.get(targetNumber);
-
-                        if (!target.isDead()) { //Se o alvo não está morto
-                            personagem.attack(target);
-                            naoAtacou = false;
-                        } else {
-                            targets.remove(target);
-                        }
-                    } 
-                }
-            }
+        if (teamB.isEmpty()) {
+            nextLevel();
         }
 
+        for (int i = 0; i < allCharacters.size(); i++) {
+            int moveDirection;
+            personagem = allCharacters.get(i);
+            Team targets;
+            Team friends;
+            if (teamA.contains(personagem)) {
+                targets = teamB;
+                friends = teamA;
+                moveDirection = 1;
+            } else {
+                targets = teamA;
+                friends = teamB;
+                moveDirection = -1;
+            }
+
+            switch (personagem.getStatus()) {
+                case DEAD:
+                    //friends.remove(personagem);
+                    break;
+
+                case WAITING:
+                    if (personagem.canAttack()) {
+                        if (!targets.isEmpty()) {
+                            personagem.setStatus(GOING);
+                            Tween.to(personagem, CharacterAccessor.POS_X, 1.5f).target(personagem.getX() + 100 * moveDirection).delay(0).start(tweenManager);
+                        }
+                    }
+                    break;
+
+                case GOING:
+                    if (targets.isEmpty()) {
+                        tweenManager.killTarget(personagem, 1);
+                        personagem.setStatus(RETURNING);
+                        Tween.to(personagem, CharacterAccessor.POS_X, 1).target(personagem.orgX).delay(0).start(tweenManager);
+                    } else if (personagem.getX() == personagem.orgX + 100 * moveDirection) {
+                        personagem.setStatus(ATTACKING);
+                        targetNumber = random.nextInt(targets.size());
+                        target = targets.get(targetNumber);
+                        personagem.attack(target);
+                        if (target.isDead()) {
+                            targets.remove(target);
+                        }
+                    }
+                    break;
+
+                case ATTACKING:
+                    if (personagem.getAnimations().isAnimationFinished()) {
+                        personagem.setStatus(RETURNING);
+                        Tween.to(personagem, CharacterAccessor.POS_X, 1).target(personagem.orgX).delay(0).ease(Linear.INOUT).start(tweenManager);
+                    }
+                    break;
+
+                case RETURNING:
+                    if (personagem.getX() == personagem.orgX) {
+                        personagem.getAnimations().flipFrames(true, false);
+                        personagem.setStatus(WAITING);
+                    }
+                    break;
+
+                case DYING:
+                    //friends.remove(personagem);
+                    if (personagem.getAnimations().isAnimationFinished()) {
+                        personagem.setStatus(DEAD);
+                    }
+                    break;
+            }
+        }
     }
 
     @Override
@@ -111,7 +171,11 @@ public class BattleScreen implements Screen, Move2PlayGame {
         Player player = searchPlayer(uuid);
         if (player != null) { //Se a referência não for nula
             if (!player.isDead()) { // e o jogador não estiver morto.
-                player.contarPedalada(n);
+                if (player.getPedaladasRestantes() - n <= 0) {
+                    player.contarPedalada(player.getPedaladasRestantes());
+                } else {
+                    player.contarPedalada(n);
+                }
             }
         }
     }
@@ -129,12 +193,10 @@ public class BattleScreen implements Screen, Move2PlayGame {
         return null;
     }
 
-    
-
     @Override
-    public void render(float f) {
-        checarCondicoes();
-        
+    public void render(float delta) {
+        update(delta);
+
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();

@@ -7,7 +7,7 @@ import java.util.ArrayList;
  *
  * @author reysguep
  */
-public class Team extends ArrayList<Character>{
+public class Team extends ArrayList<Character> {
 
     public Team(char team) {
         this.team = team;
@@ -15,18 +15,15 @@ public class Team extends ArrayList<Character>{
 
     private final char team;
 
-
     public void addMember(Character character) {
         int nMembers;
         int x = 0;
-        
+
         super.add(character);
         nMembers = size();
-        
-        character.resizeLockWidth(300);
-        
+
         if (team == 'A' || team == 'a') {
-            switch(nMembers){
+            switch (nMembers) {
                 case 1:
                     x = 0;
                     break;
@@ -39,26 +36,28 @@ public class Team extends ArrayList<Character>{
                 case 4:
                     x = 160 * 3;
                     break;
-                    
+
             }
         } else {
-            switch(nMembers){
+            switch (nMembers) {
                 case 1:
                     x = 160 * 6;
                     break;
                 case 2:
-                    x = 160 * 6;
-                    break;
-                case 3:
                     x = 160 * 5;
                     break;
-                case 4:
+                case 3:
                     x = 160 * 4;
                     break;
-                    
+                case 4:
+                    x = (int)(4.5 * 160);
+                    break;
+
             }
             character.flipAllAnimations(true, false);
         }
         character.setPosition(x, 100);
+        character.orgX = x;
+        character.orgY = 100;
     }
 }

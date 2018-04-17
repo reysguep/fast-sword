@@ -8,10 +8,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.game.Background;
 import com.mygdx.game.Characters.Character;
-//import com.mygdx.game.Characters.Enemy;
 import com.mygdx.game.Characters.Gunman;
 import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.Characters.Player;
@@ -20,9 +20,12 @@ import com.mygdx.game.Characters.Warrior;
 import com.mygdx.game.EnemyGenerator;
 import java.util.ArrayList;
 import java.util.Random;
+import libgdxUtils.AnimationCode;
 import libgdxUtils.DrawingCharacter;
 import libgdxUtils.CharacterAccessor;
+import libgdxUtils.ColorsUtil;
 import libgdxUtils.KeyboardUtil;
+import libgdxUtils.SpriteAcessor;
 import static libgdxUtils.StatusCode.*;
 
 /**
@@ -38,30 +41,36 @@ public class BattleScreen implements Screen, Move2PlayGame {
 
     public Team teamA, teamB;
     public ArrayList<Character> allCharacters;
-    private Background fundo;
+    private Background background;
     private DrawingCharacter drawing;
     private final MyGdxGame game;
     private SpriteBatch batch;
     private EnemyGenerator generator;
     private Music music;
     private static TweenManager tweenManager;
-    
+    private Sprite transitionColor;
+
     private int battleStatus; // 0 = battle; 1 = transition; 2 = ...
 
     @Override
     public void show() {
+        battleStatus = 0;
+
         tweenManager = new TweenManager();
         Tween.setCombinedAttributesLimit(4);
         Tween.registerAccessor(Character.class, new CharacterAccessor());
+        Tween.registerAccessor(Sprite.class, new SpriteAcessor());
 
         teamB = new Team('b');
         allCharacters = new ArrayList<Character>();
 
         allCharacters.addAll(teamA);
-
         batch = new SpriteBatch();
+        transitionColor = new Sprite(ColorsUtil.BLACK);
+        transitionColor.setSize(1280, 720);
+        transitionColor.setAlpha(0);
 
-        fundo = new Background();
+        background = new Background();
         drawing = new DrawingCharacter(batch);
 
         generator = new EnemyGenerator(this);
@@ -72,13 +81,42 @@ public class BattleScreen implements Screen, Move2PlayGame {
         for (Character chr : teamA) {
             chr.setSize(280, 350);
         }
-    }
-
-    private void nextLevel(){
         generator.newMatch();
     }
-    
-    private void update(float delta) {
+
+    private void nextLevel() {
+        if (battleStatus == 0) {
+            boolean allIdle = true;
+            for (Character chr : teamA) {
+                if (chr.getStatus() != WAITING) {
+                    allIdle = false;
+                    return;
+                }
+            }
+
+            for (Character chr : teamA) {
+                Tween.to(chr, CharacterAccessor.POS_X, 3.0f).target(chr.getX() + 750).start(tweenManager);
+                chr.setAnimation(AnimationCode.RUNNING);
+            }
+            Tween.to(transitionColor, SpriteAcessor.ALPHA, 2.7f).target(1).start(tweenManager);
+            battleStatus = 1;
+        } else {
+            if (!tweenManager.containsTarget(transitionColor)) {
+                System.out.println("OPA");
+                for (Character chr : teamA) {
+                    tweenManager.killTarget(chr);
+                    chr.setPosition(chr.orgX, chr.orgY);
+                    chr.setAnimation(AnimationCode.IDLE);
+                    generator.newMatch();
+                    background = new Background();
+                    Tween.to(transitionColor, SpriteAcessor.ALPHA, 1.0f).target(0).delay(1).start(tweenManager);
+                    battleStatus = 0;
+                }
+            }
+        }
+    }
+
+private void update(float delta) {
         tweenManager.update(delta);
 
         final Random random = new Random();
@@ -152,6 +190,9 @@ public class BattleScreen implements Screen, Move2PlayGame {
                 case DYING:
                     //friends.remove(personagem);
                     if (personagem.getAnimations().isAnimationFinished()) {
+                        if(teamB.contains(personagem)){
+                            allCharacters.remove(personagem);
+                        }
                         personagem.setStatus(DEAD);
                     }
                     break;
@@ -160,17 +201,17 @@ public class BattleScreen implements Screen, Move2PlayGame {
     }
 
     @Override
-    public void dispose() {
+        public void dispose() {
         drawing.dispose();
         batch.dispose();
 
     }
 
     @Override
-    public void move(String uuid, int n) {
+        public void move(String uuid, int n) {
         Player player = searchPlayer(uuid);
         if (player != null) { //Se a referência não for nula
-            if (!player.isDead()) { // e o jogador não estiver morto.
+            if (!player.isDead() && battleStatus == 0) { // e o jogador não estiver morto.
                 if (player.getPedaladasRestantes() - n <= 0) {
                     player.contarPedalada(player.getPedaladasRestantes());
                 } else {
@@ -194,64 +235,63 @@ public class BattleScreen implements Screen, Move2PlayGame {
     }
 
     @Override
-    public void render(float delta) {
+        public void render(float delta) {
         update(delta);
-
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
 
-        fundo.draw(batch);
+        background.draw(batch);
 
         for (Character personagem : allCharacters) {
             drawing.draw(personagem);
         }
-
+        transitionColor.draw(batch);
         batch.end();
     }
 
     @Override
-    public void resize(int i, int i1) {
+        public void resize(int i, int i1) {
 
     }
 
     @Override
-    public void pause() {
+        public void pause() {
 
     }
 
     @Override
-    public void resume() {
+        public void resume() {
 
     }
 
     @Override
-    public void hide() {
+        public void hide() {
 
     }
 
     @Override
-    public void initGame() {
+        public void initGame() {
 
     }
 
     @Override
-    public void closeGame() {
+        public void closeGame() {
 
     }
 
     @Override
-    public void startMatch() {
+        public void startMatch() {
 
     }
 
     @Override
-    public void finishMatch() {
+        public void finishMatch() {
 
     }
 
     @Override
-    public void addPlayer(br.cefetmg.move2play.model.Player player) {
+        public void addPlayer(br.cefetmg.move2play.model.Player player) {
         Random random = new Random();
         int sortedN = random.nextInt(2);
         Player plyr = new Warrior(player);
@@ -294,7 +334,7 @@ public class BattleScreen implements Screen, Move2PlayGame {
     }
 
     @Override
-    public void removePlayer(br.cefetmg.move2play.model.Player player) {
+        public void removePlayer(br.cefetmg.move2play.model.Player player) {
         Player plyr = searchPlayer(player.getUUID());
         if (plyr != null) {
             allCharacters.remove(plyr);

@@ -1,0 +1,6 @@
+gunner;hit3;death1
+attack random enemy;kill random enemy
+14
+100;200
+250
+60

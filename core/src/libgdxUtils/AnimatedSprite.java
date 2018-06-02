@@ -20,8 +20,6 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import java.io.Serializable;
-import com.badlogic.gdx.utils.JsonValue;
 
 /**
  * An {@link AnimatedSprite} holds an {@link Animation} and sets the
@@ -37,7 +35,7 @@ import com.badlogic.gdx.utils.JsonValue;
  *
  * @author dermetfan
  */
-public class AnimatedSprite extends Sprite{
+public class AnimatedSprite extends Sprite {
 
     /**
      * the {@link Animation} to display
@@ -49,8 +47,7 @@ public class AnimatedSprite extends Sprite{
      */
     private float time;
 
-    protected boolean flipX = false;
-    protected boolean flipY = false;
+    protected boolean flipX = false, flipY = false;
 
     /**
      * if the animation is playing
@@ -184,10 +181,18 @@ public class AnimatedSprite extends Sprite{
      * instead of actually flipping them
      */
     public void flipFrames(float startTime, float endTime, boolean flipX, boolean flipY, boolean set) {
+        if (set) {
+            flipX = this.flipX ^ flipX;
+            flipY = this.flipY ^ flipY;
+            this.flipX = this.flipX ^ flipX;
+            this.flipY = this.flipY ^ flipY;
+        }
+
         for (float t = startTime; t < endTime; t += animation.getFrameDuration()) {
             TextureRegion frame = animation.getKeyFrame(t);
-            frame.flip(set ? flipX && !frame.isFlipX() : flipX, set ? flipY && !frame.isFlipY() : flipY);
+            frame.flip(flipX, flipY);
         }
+
     }
 
     /**

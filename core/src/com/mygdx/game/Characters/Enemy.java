@@ -8,9 +8,9 @@ import com.badlogic.gdx.utils.TimeUtils;
  */
 public class Enemy extends Character {
 
-    public Enemy(String nome, int maxHealth, int strength, float timeToAttack, String folder) {
-        super(nome, maxHealth, strength, "enemies/" + folder);
-
+    public Enemy(EnemyPreset preset, int health, int strength, float timeToAttack) {
+        super(preset.name, preset, health, strength);
+        
         this.startTime = TimeUtils.millis();
         this.timeToAttack = (long) (timeToAttack * 1000);
     }
@@ -26,8 +26,7 @@ public class Enemy extends Character {
     }
 
     @Override
-    public void attack(Character target) {
-        super.attackMessage(target);
+    public void act() {
         startTime = TimeUtils.millis();
     }
 

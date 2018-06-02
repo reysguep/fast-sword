@@ -1,13 +1,13 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Characters.Character;
-import java.util.ArrayList;
 
 /**
  *
  * @author reysguep
  */
-public class Team extends ArrayList<Character> {
+public class Team extends Array<Character> {
 
     public Team(char team) {
         this.team = team;
@@ -20,9 +20,11 @@ public class Team extends ArrayList<Character> {
         int x = 0;
 
         super.add(character);
-        nMembers = size();
+        nMembers = this.size;
+        
+        character.team = team;
 
-        if (team == 'A' || team == 'a') {
+        if (team == 'a') {
             switch (nMembers) {
                 case 1:
                     x = 0;
@@ -54,7 +56,7 @@ public class Team extends ArrayList<Character> {
                     break;
 
             }
-            character.flipAllAnimations(true, false);
+            character.getAnimations().flipAllAnimations(true, false);
         }
         character.setPosition(x, 100);
         character.orgX = x;

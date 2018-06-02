@@ -1,1 +1,0 @@
-skeleton;Skeleton;500;20;4;200;350

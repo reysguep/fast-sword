@@ -12,11 +12,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.mygdx.game.Characters.Gunman;
 import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.Characters.Player;
+import com.mygdx.game.PlayerGenerator;
 import com.mygdx.game.Team;
-import com.mygdx.game.Characters.Warrior;
 import java.util.Random;
 
 /**
@@ -44,10 +43,14 @@ public class WaitingScreen implements Screen, Move2PlayGame {
     private long startTime;
     private String dot = "";
     private GlyphLayout layout;
+    
     private PlayersWaiting players;
+    private PlayerGenerator plyGenerator;
 
     @Override
     public void show() {
+        plyGenerator = new PlayerGenerator();
+        
         layout = new GlyphLayout();
         music = Gdx.audio.newMusic(Gdx.files.internal("Audios/musics/evocation.mp3"));
         background = new Texture(Gdx.files.internal("Animations/waitingBG.jpg"));
@@ -165,41 +168,12 @@ public class WaitingScreen implements Screen, Move2PlayGame {
 
     @Override
     public void addPlayer(br.cefetmg.move2play.model.Player player) {
-        Random random = new Random();
-        int sortedN = random.nextInt(2);
-        Player plyr = new Warrior(player);
-
-        switch (sortedN) {
-            case 0:
-                plyr = new Warrior(player);
-                break;
-            case 1:
-                plyr = new Gunman(player);
-                break;
-            case 2:
-                //plyr = new Archer(player);
-                break;
-        }
-
+        Player plyr = plyGenerator.newPlayer(player);
+        players.addPlayer(plyr);
     }
 
-    public void addPlayer(String nome) {
-        Random random = new Random();
-        int sortedN = random.nextInt(2);
-        Player plyr = new Warrior(nome);
-
-        switch (sortedN) {
-            case 0:
-                plyr = new Warrior(nome);
-                break;
-            case 1:
-                plyr = new Gunman(nome);
-                break;
-            case 2:
-                //plyr = new Archer(player);
-                break;
-        }
-
+    public void addPlayer(String name) {
+        Player plyr = plyGenerator.newPlayer(name);
         players.addPlayer(plyr);
     }
 

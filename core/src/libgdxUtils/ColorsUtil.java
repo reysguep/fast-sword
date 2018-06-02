@@ -12,11 +12,13 @@ public class ColorsUtil {
     public static final Texture BLUE = new Texture(Gdx.files.internal("Colors/blue.png"));
     public static final Texture BLACK = new Texture(Gdx.files.internal("Colors/black.png"));
     public static final Texture GREEN = new Texture(Gdx.files.internal("Colors/green.png"));
+    public static final Texture GOLD = new Texture(Gdx.files.internal("Colors/gold.png"));
     
     public static void dispose(){
         RED.dispose();
         BLUE.dispose();
         GREEN.dispose();
         BLACK.dispose();
+        GOLD.dispose();
     }
 }

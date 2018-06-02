@@ -4,6 +4,7 @@ import br.cefetmg.move2play.game.Move2PlayGame;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.mygdx.game.Screens.BattleScreen;
+import com.mygdx.game.Screens.EndMatchScreen;
 import com.mygdx.game.Screens.WaitingScreen;
 
 /**
@@ -21,13 +22,19 @@ public class KeyboardUtil implements InputProcessor {
     @Override
     public boolean keyDown(int keycode) {
         if (screenM instanceof WaitingScreen) {
-            WaitingScreen screen = (WaitingScreen)screenM;
+            WaitingScreen screen = (WaitingScreen) screenM;
             switch (keycode) {
-                case Keys.I:
+                case Keys.U:
                     screen.addPlayer("Lancelot");
                     break;
-                case Keys.O:
+                case Keys.I:
                     screen.addPlayer("Elliot");
+                    break;
+                case Keys.O:
+                    screen.addPlayer("Noah");
+                    break;
+                case Keys.P:
+                    screen.addPlayer("General");
                     break;
                 case Keys.K:
                     screen.removePlayer("Lancelot");
@@ -42,14 +49,20 @@ public class KeyboardUtil implements InputProcessor {
                     break;
             }
         }
-        if(screenM instanceof BattleScreen){
-            BattleScreen screen = (BattleScreen)screenM;
+        else if (screenM instanceof BattleScreen) {
+            BattleScreen screen = (BattleScreen) screenM;
             switch (keycode) {
-                case Keys.I:
+                case Keys.U:
                     screen.move("Lancelot", 1);
                     break;
-                case Keys.O:
+                case Keys.I:
                     screen.move("Elliot", 1);
+                    break;
+                case Keys.O:
+                    screen.move("Noah", 1);
+                    break;
+                case Keys.P:
+                    screen.move("General", 1);
                     break;
                 case Keys.K:
                     screen.removePlayer("Lancelot");
@@ -57,8 +70,17 @@ public class KeyboardUtil implements InputProcessor {
                 case Keys.L:
                     screen.removePlayer("Elliot");
                     break;
+                case Keys.BACKSPACE:
+                    screen.finishMatch();
                 default:
                     break;
+            }
+        }
+        else if(screenM instanceof EndMatchScreen){
+            switch(keycode){
+                case Keys.ENTER:
+                    screenM.initGame();
+                break;
             }
         }
         return true;

@@ -1,36 +1,70 @@
 package com.mygdx.game.Characters;
 
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import libgdxUtils.AnimatedSprite;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.TimeUtils;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import libgdxUtils.AnimationCode;
+import libgdxUtils.Commands;
 import libgdxUtils.MultiAnimatedSprite;
 import libgdxUtils.StatusCode;
 import libgdxUtils.TextureUtil;
+import libgdxUtils.exceptions.CommandException;
 
 /**
  *
  * @author reysguep
  */
-public abstract class Character {
+ public abstract class Character {
 
-    public Character(String name, int maxHealth, int strength, String folder) {
+    public Character(String name, CharacterPreset preset, int maxHealth, int strength) {
         this.maxHealth = maxHealth;
-        this.health = maxHealth;
+        this.health = this.maxHealth;
         this.strength = strength;
-        this.animations = TextureUtil.createAnimationsCharacter("Animations/" + folder);
+        this.animations = TextureUtil.createAnimationsCharacter("Animations/" + preset.folder);
+        animations.setSize(preset.width, preset.height);
         this.name = name;
         status = 1;
+
+        this.hitSounds = preset.hitSounds;
+        this.deathSounds = preset.deathSounds;
+        
+        this.actionCode = preset.actionCode;
+        this.deathCode = preset.deathCode;
     }
 
-    protected int health;
+    public Character(String name, CharacterPreset preset) {
+        this.maxHealth = preset.maxHealth;
+        this.health = this.maxHealth;
+        this.strength = preset.maxStr;
+        this.animations = TextureUtil.createAnimationsCharacter("Animations/" + preset.folder);
+        animations.setSize(preset.width, preset.height);
+        this.name = name;
+        status = 1;
+
+        this.hitSounds = preset.hitSounds;
+        this.deathSounds = preset.deathSounds;
+        
+        this.actionCode = preset.actionCode;
+        this.deathCode = preset.deathCode;
+    }
+
+    public int health;
     protected int maxHealth;
     protected int strength;
 
-    
+    private final Array<Sound> hitSounds, deathSounds;
+
     private int status;
     public int orgX, orgY;
 
-    public String name, team;
+    public String name;
+    public char team;
+    
+    public String actionCode, deathCode;
 
     private final MultiAnimatedSprite animations;
 
@@ -38,18 +72,30 @@ public abstract class Character {
         return health <= 0;
     }
 
-    public abstract void attack(Character target);
-
-    protected void attackMessage(Character target) {
-        System.out.println(name + " atacou " + target.getName());
-        target.beAttacked(strength);
-        this.animations.startAnimation(AnimationCode.ATTACKING);
+    public void act(Commands commands){
+        setStatus(StatusCode.ACTING);
+        try {
+            commands.call(actionCode, this);
+        } catch (CommandException ex) {
+            Logger.getLogger(Character.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        act();
+        setAnimation(AnimationCode.ATTACKING);
+        hitSounds.random().play();
     }
+    protected abstract void act();
+    
 
-    public void beAttacked(int damage) {
+    public void beAttacked(int damage, Commands commands) {
         health -= damage;
         if (health <= 0) {
             setStatus(StatusCode.DYING);
+            try {
+                commands.call(deathCode, this);
+            } catch (CommandException ex) {
+                Logger.getLogger(Character.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
@@ -118,19 +164,6 @@ public abstract class Character {
         return (int) animations.getWidth();
     }
 
-    public void flipAllAnimations(boolean flipX, boolean flipY) {
-        AnimatedSprite as;
-
-        as = new AnimatedSprite(animations.getAnimation(AnimationCode.IDLE));
-        as.flipFrames(flipX, flipY);
-
-        as = new AnimatedSprite(animations.getAnimation(AnimationCode.ATTACKING));
-        as.flipFrames(flipX, flipY);
-
-        as = new AnimatedSprite(animations.getAnimation(AnimationCode.DYING));
-        as.flipFrames(flipX, flipY);
-    }
-
     public MultiAnimatedSprite getAnimations() {
         return animations;
     }
@@ -150,20 +183,39 @@ public abstract class Character {
             case StatusCode.WAITING:
                 setAnimation(AnimationCode.IDLE);
                 break;
+
             case StatusCode.GOING:
                 setAnimation(AnimationCode.RUNNING);
+                animations.flipFrames(false, false, true);
                 break;
-            case StatusCode.ATTACKING:
-                setAnimation(AnimationCode.ATTACKING);
+
+            case StatusCode.ACTING:
                 break;
+
             case StatusCode.RETURNING:
                 setAnimation(AnimationCode.RUNNING);
-                animations.flipFrames(true, false);
+                animations.flipFrames(true, false, true);
                 break;
             case StatusCode.DYING:
                 health = 0;
                 animations.startAnimation(AnimationCode.DYING);
                 System.out.println(name + " morreu!");
+                deathSounds.random().play();
+                break;
+
+            case StatusCode.REVIVING:
+                animations.getAnimation(AnimationCode.DYING).setPlayMode(Animation.PlayMode.REVERSED);
+                setAnimation(AnimationCode.DYING);
+                health = maxHealth;
+                break;
+
+            case StatusCode.DEAD:
+                if (this instanceof Player) {
+                    Player thisPlayer = (Player) this;
+                    thisPlayer.pedaladasDadas = 0;
+                    thisPlayer.score /= 2;
+                    thisPlayer.timeDied = TimeUtils.millis();
+                }
                 break;
         }
     }

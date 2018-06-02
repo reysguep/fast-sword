@@ -1,0 +1,7 @@
+skeleton;hit2;death1
+attack all enemy;nothing
+400;250; height / width
+20;35; min/max strength
+450;600; min/max health
+4;7; min/max time to attack
+Skeleton

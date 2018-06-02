@@ -4,10 +4,8 @@ package com.mygdx.game.Characters;
  *
  * @author reysguep
  */
-public class EnemyPreset {
-    public String folder;
-    public int height, width,
-            minStr, maxStr,
-            minHealth, maxHealth;
+public class EnemyPreset extends CharacterPreset{
     public float minTTA, maxTTA; //time to attack
+    public int minStr, minHealth;
+    public String name;
 }

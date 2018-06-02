@@ -1,15 +1,11 @@
 package com.mygdx.game;
 
-import aurelienribon.tweenengine.Tween;
-import aurelienribon.tweenengine.TweenManager;
 import com.mygdx.game.Screens.SplashScreen;
 import br.cefetmg.move2play.game.Move2PlayGame;
 import br.cefetmg.move2play.settings.GameSettings;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
-import libgdxUtils.AnimatedSprite;
-import libgdxUtils.SpriteAcessor;
 
 public class MyGdxGame extends Game implements Move2PlayGame, ApplicationListener {
 
@@ -55,6 +51,7 @@ public class MyGdxGame extends Game implements Move2PlayGame, ApplicationListene
     @Override
     public void dispose() {
         super.dispose();
+        
     }
     
     @Override

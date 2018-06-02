@@ -1,0 +1,6 @@
+warrior;hit1;death1
+attack random enemy;nothing
+17
+100;200
+300
+70

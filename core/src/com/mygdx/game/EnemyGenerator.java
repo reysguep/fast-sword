@@ -6,6 +6,7 @@ import com.mygdx.game.Screens.BattleScreen;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
+import libgdxUtils.SoundUtil;
 import libgdxUtils.TextureUtil;
 
 /**
@@ -26,11 +27,14 @@ public class EnemyGenerator {
     public void newMatch() {
         Random random;
         int nEnemies;
-        int nPlayers;
+        int nPlayers = 0;
 
-        nPlayers = screen.teamA.size();
+        for(com.mygdx.game.Characters.Character chr : screen.allCharacters){
+            if(chr.team == 'a')
+                nPlayers++;
+        }
         random = new Random();
-        nEnemies = random.nextInt(nPlayers) + 1;
+        nEnemies = nPlayers - random.nextInt(nPlayers);
 
         for (int i = 0; i < nEnemies; i++) {
             generate();
@@ -53,7 +57,7 @@ public class EnemyGenerator {
         strength = random.nextInt(preset.maxStr - preset.minStr) + preset.minStr;
         timeToAttack = random.nextInt((int)(preset.maxTTA - preset.minTTA) * 10) / 10 + preset.maxTTA;
         
-        enemy = new Enemy("Skeleton", health, strength, timeToAttack, preset.folder);
+        enemy = new Enemy(preset, health, strength, timeToAttack);
         
         enemy.setSize(preset.width, preset.height);
         
@@ -64,22 +68,29 @@ public class EnemyGenerator {
     private static ArrayList<EnemyPreset> getPresets() {
         ArrayList<EnemyPreset> presets = new ArrayList<EnemyPreset>();
         
-        File folder = new File("EnemiesPresets");
+        File folder = new File("Presets/enemies");
         File[] listOfFiles = folder.listFiles();
         
         for (File file : listOfFiles) {
-            String[][] strPst = TextureUtil.splitFile("EnemiesPresets/" + file.getName(), ";");
+            String[][] strPst = TextureUtil.splitFile("Presets/enemies/" + file.getName(), ";");
             EnemyPreset enemyPst = new EnemyPreset();
-            enemyPst.folder = strPst[0][0];
-            System.out.println(strPst[0][0]);
-            enemyPst.height = Integer.parseInt(strPst[1][0]);
-            enemyPst.width = Integer.parseInt(strPst[1][1]);
-            enemyPst.minStr = Integer.parseInt(strPst[2][0]);
-            enemyPst.maxStr = Integer.parseInt(strPst[2][1]);
-            enemyPst.minHealth = Integer.parseInt(strPst[3][0]);
-            enemyPst.maxHealth = Integer.parseInt(strPst[3][1]);
-            enemyPst.minTTA = Float.parseFloat(strPst[4][0]);
-            enemyPst.maxTTA = Float.parseFloat(strPst[4][1]);
+            
+            enemyPst.hitSounds = SoundUtil.getSounds("Audios/sounds/" + strPst[0][1]);
+            enemyPst.deathSounds = SoundUtil.getSounds("Audios/sounds/" + strPst[0][2]);
+            
+            enemyPst.folder = "enemies/" + strPst[0][0];
+            enemyPst.actionCode = strPst[1][0];
+            enemyPst.deathCode = strPst[1][1];
+            enemyPst.height = Integer.parseInt(strPst[2][0]);
+            enemyPst.width = Integer.parseInt(strPst[2][1]);
+            enemyPst.minStr = Integer.parseInt(strPst[3][0]);
+            enemyPst.maxStr = Integer.parseInt(strPst[3][1]);
+            enemyPst.minHealth = Integer.parseInt(strPst[4][0]);
+            enemyPst.maxHealth = Integer.parseInt(strPst[4][1]);
+            enemyPst.minTTA = Float.parseFloat(strPst[5][0]);
+            enemyPst.maxTTA = Float.parseFloat(strPst[5][1]);
+            enemyPst.name = strPst[6][0];
+            
             presets.add(enemyPst);
         }
         
@@ -87,5 +98,4 @@ public class EnemyGenerator {
         
         return presets;
     }
-
 }

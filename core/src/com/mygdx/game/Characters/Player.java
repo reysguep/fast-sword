@@ -1,40 +1,41 @@
 package com.mygdx.game.Characters;
 
-import com.mygdx.game.Characters.Character;
+import libgdxUtils.Commands;
 
 /**
  *
  * @author reysguep
  */
 
-public abstract class Player extends Character {
+public class Player extends Character implements Comparable<Player>{
 
-    public Player(int maxHealth, int strength, int pedaladasMinimas, String folder, br.cefetmg.move2play.model.Player player) {
-        super(player.getName(), maxHealth, strength, "player/" + folder);
+    public Player(br.cefetmg.move2play.model.Player player, PlayerPreset preset) {
+        super(player.getName(), preset);
         pedaladasDadas = 0;
-        this.pedaladasMinimas = pedaladasMinimas;
+        this.pedaladasMinimas = preset.pedaladasMinimas;
         uuid = player.getUUID();
     }
-    
-    public Player(int maxHealth, int strength, int pedaladasMinimas, String folder, String name) {
-        super(name, maxHealth, strength, "player/" + folder);
+
+    public Player(String name, PlayerPreset pst) {
+        super(name, pst);
         pedaladasDadas = 0;
-        this.pedaladasMinimas = pedaladasMinimas;
+        this.pedaladasMinimas = pst.pedaladasMinimas;
         uuid = "1111";
     }
 
-    private int pedaladasDadas;
-    private int pedaladasMinimas;
-    public static int width, height;
+    public int pedaladasDadas, pedaladasMinimas;
+    
+    public long timeDied;
 
     private final String uuid;
+    
+    public int score;
 
     @Override
-    public void attack(Character target) {
-        super.attackMessage(target);
+    public void act() {
         pedaladasDadas -= pedaladasMinimas;
     }
-
+    
     public void upgradeStrength() {
         strength *= (120 / 100);
     }
@@ -61,14 +62,19 @@ public abstract class Player extends Character {
     }
 
     @Override
-    public float getProgress(){
+    public float getProgress() {
         float progress;
-        
-        progress = (float)pedaladasDadas / pedaladasMinimas; // 1 = pode atacar
+
+        progress = (float) pedaladasDadas / pedaladasMinimas; // >=1 -> pode atacar
         return progress;
     }
-    
-    public float getPedaladasRestantes(){
+
+    public float getPedaladasRestantes() {
         return pedaladasMinimas - pedaladasDadas;
+    }
+
+    @Override
+    public int compareTo(Player t) {
+        return Integer.compare(t.score, this.score);
     }
 }

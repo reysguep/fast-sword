@@ -1,0 +1,7 @@
+blob;hit4;death1
+attack random enemy;heal all enemy
+300;375
+40;53
+800;1000
+7;10
+Slime

@@ -27,6 +27,7 @@ public class TextureUtil {
         Animation<TextureRegion> idle;
         Animation<TextureRegion> attacking;
         Animation<TextureRegion> dying;
+        Animation<TextureRegion> running;
         Texture textura;
         Map<String, Animation> animations = new HashMap<String, Animation>();
 
@@ -35,15 +36,17 @@ public class TextureUtil {
         String dados[][] = splitFile(folder + "/data.txt", "/");
 
         idle = getRespectiveAnimation(AnimationCode.IDLE, dados, folder);
+        running = getRespectiveAnimation(AnimationCode.IDLE, dados, folder);
         attacking = getRespectiveAnimation(AnimationCode.ATTACKING, dados, folder);
         dying = getRespectiveAnimation(AnimationCode.DYING, dados, folder);
 
         animations.put(AnimationCode.IDLE, idle);
         animations.put(AnimationCode.ATTACKING, attacking);
         animations.put(AnimationCode.DYING, dying);
-        animations.put(AnimationCode.RUNNING, idle);
+        animations.put(AnimationCode.RUNNING, running);
 
         idle.setPlayMode(Animation.PlayMode.LOOP);
+        running.setPlayMode(Animation.PlayMode.LOOP);
         multiAnimations = new MultiAnimatedSprite(animations, AnimationCode.IDLE);
 
         return multiAnimations;

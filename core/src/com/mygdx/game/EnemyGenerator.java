@@ -53,6 +53,7 @@ public class EnemyGenerator {
         sortedPst = random.nextInt(presets.size());
         preset = presets.get(sortedPst);
         
+        
         health = random.nextInt(preset.maxHealth - preset.minHealth) + preset.minHealth;
         strength = random.nextInt(preset.maxStr - preset.minStr) + preset.minStr;
         timeToAttack = random.nextInt((int)(preset.maxTTA - preset.minTTA) * 10) / 10 + preset.maxTTA;
@@ -79,6 +80,7 @@ public class EnemyGenerator {
             enemyPst.deathSounds = SoundUtil.getSounds("Audios/sounds/" + strPst[0][2]);
             
             enemyPst.folder = "enemies/" + strPst[0][0];
+            enemyPst.targetAnimation = strPst[0][3];
             enemyPst.actionCode = strPst[1][0];
             enemyPst.deathCode = strPst[1][1];
             enemyPst.height = Integer.parseInt(strPst[2][0]);

@@ -1,4 +1,4 @@
-blob;hit4;death1
+blob;hit4;death1;splash
 attack random enemy;heal all enemy
 300;375
 40;53

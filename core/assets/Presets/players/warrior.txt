@@ -1,4 +1,4 @@
-warrior;hit1;death1
+warrior;hit1;death1;slash
 attack random enemy;nothing
 17
 100;200

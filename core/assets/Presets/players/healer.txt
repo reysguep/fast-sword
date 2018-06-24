@@ -1,4 +1,4 @@
-healer;hit3;death1
+healer;hit3;death1;healing
 heal lowest_health ally;heal all ally
 14
 100;200

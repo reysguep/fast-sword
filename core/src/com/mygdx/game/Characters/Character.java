@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import libgdxUtils.AnimatedSprite;
 import libgdxUtils.AnimationCode;
 import libgdxUtils.Commands;
 import libgdxUtils.MultiAnimatedSprite;
@@ -34,6 +35,7 @@ import libgdxUtils.exceptions.CommandException;
         
         this.actionCode = preset.actionCode;
         this.deathCode = preset.deathCode;
+        this.targetAnimation = TextureUtil.visualEffects.get(preset.targetAnimation);
     }
 
     public Character(String name, CharacterPreset preset) {
@@ -50,6 +52,8 @@ import libgdxUtils.exceptions.CommandException;
         
         this.actionCode = preset.actionCode;
         this.deathCode = preset.deathCode;
+        
+        this.targetAnimation = TextureUtil.visualEffects.get(preset.targetAnimation);
     }
 
     public int health;
@@ -64,7 +68,8 @@ import libgdxUtils.exceptions.CommandException;
     public String name;
     public char team;
     
-    public String actionCode, deathCode;
+    public final String actionCode, deathCode;
+    public final Animation targetAnimation;
 
     private final MultiAnimatedSprite animations;
 

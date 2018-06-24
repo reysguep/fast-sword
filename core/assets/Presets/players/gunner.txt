@@ -1,4 +1,4 @@
-gunner;hit3;death1
+gunner;hit3;death1;shoot
 attack random enemy;kill random enemy
 14
 100;200

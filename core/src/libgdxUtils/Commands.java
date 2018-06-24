@@ -1,11 +1,14 @@
 package libgdxUtils;
 
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.game.Screens.BattleScreen;
 import com.mygdx.game.Characters.Character;
 import com.mygdx.game.Characters.Enemy;
 import com.mygdx.game.Characters.Player;
+import com.mygdx.game.HitAnimation;
 import libgdxUtils.exceptions.CommandException;
 
 /**
@@ -126,7 +129,8 @@ public class Commands {
     }
 
     private void attack(Character chr, Array<Character> targets) {
-        for (Character target : targets) {
+        for(int i = 0; i < targets.size; i++){
+            Character target = targets.get(i);
             attack(chr, target);
         }
     }
@@ -154,6 +158,7 @@ public class Commands {
             Player player = (Player) chr;
             player.score += player.getStrength() * multiplier;
         }
+        addHitAnimation(chr, target);
     }
 
     private void heal(Character chr, Array<Character> targets) {
@@ -170,6 +175,7 @@ public class Commands {
             }
             System.out.println(chr.getName() + " healed " + target.getName() + ".");
         }
+        addHitAnimation(chr, target);
     }
 
     private void kill(Character chr, Array<Character> targets) {
@@ -188,5 +194,11 @@ public class Commands {
         screen.tweenManager.killTarget(target, 1);
 
         System.out.println(chr.getName() + " killed " + target.getName() + " instantly.");
+        addHitAnimation(chr, target);
+    }
+    
+    private void addHitAnimation(Character chr, Character target) {
+        Animation<TextureRegion> anim = chr.targetAnimation;
+        screen.hits.add(new HitAnimation(target, anim, screen.hits));
     }
 }

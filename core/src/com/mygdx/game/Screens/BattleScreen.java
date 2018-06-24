@@ -1,7 +1,9 @@
 package com.mygdx.game.Screens;
 
 import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenEquation;
 import aurelienribon.tweenengine.TweenManager;
+import aurelienribon.tweenengine.equations.Expo;
 import aurelienribon.tweenengine.equations.Linear;
 import br.cefetmg.move2play.game.Move2PlayGame;
 import com.badlogic.gdx.Gdx;
@@ -20,6 +22,7 @@ import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.Characters.Player;
 import com.mygdx.game.Team;
 import com.mygdx.game.EnemyGenerator;
+import com.mygdx.game.HitAnimation;
 import com.mygdx.game.PlayerGenerator;
 import java.util.ArrayList;
 import java.util.Random;
@@ -29,6 +32,8 @@ import libgdxUtils.CharacterAccessor;
 import libgdxUtils.ColorsUtil;
 import libgdxUtils.Commands;
 import libgdxUtils.KeyboardUtil;
+import libgdxUtils.MusicAccessor;
+import libgdxUtils.MusicUtils;
 import libgdxUtils.SpriteAcessor;
 import static libgdxUtils.StatusCode.*;
 
@@ -51,6 +56,7 @@ public class BattleScreen implements Screen, Move2PlayGame {
     private SpriteBatch batch;
     private EnemyGenerator generator;
     private PlayerGenerator plyGenerator;
+    private MusicUtils musicUtils;
     private Music music;
     public TweenManager tweenManager;
     private Sprite transitionColor;
@@ -59,6 +65,8 @@ public class BattleScreen implements Screen, Move2PlayGame {
     private int battleStatus; // 0 = battle; 1 = transition; 2 = ...
 
     private int phase;
+
+    public Array<HitAnimation> hits;
 
     @Override
     public void show() {
@@ -69,6 +77,7 @@ public class BattleScreen implements Screen, Move2PlayGame {
         Tween.setCombinedAttributesLimit(4);
         Tween.registerAccessor(Character.class, new CharacterAccessor());
         Tween.registerAccessor(Sprite.class, new SpriteAcessor());
+        Tween.registerAccessor(Music.class, new MusicAccessor());
 
         teamB = new Team('b');
         allCharacters = new Array<Character>();
@@ -92,12 +101,21 @@ public class BattleScreen implements Screen, Move2PlayGame {
             chr.setSize(280, 350);
         }
 
+        musicUtils = new MusicUtils("Audios/musics/battle screen");
+        music = musicUtils.nextSong();
+        music.play();
+
         teamA.get(0).health = 1;
         commands = new Commands(this);
         generator.newMatch();
+
+        hits = new Array<HitAnimation>();
+
     }
 
     private void nextLevel() {
+        float transitionTime = 2.7f;
+
         if (battleStatus == 0) {
             boolean allIdle = true;
             for (Character chr : teamA) {
@@ -114,11 +132,14 @@ public class BattleScreen implements Screen, Move2PlayGame {
                     chr.getAnimations().flipFrames(false, false, true);
                     if (chr instanceof Player) {
                         Player player = (Player) chr;
-                        System.out.println(player.getName() + " score: " + player.score);
                     }
                 }
             }
             Tween.to(transitionColor, SpriteAcessor.ALPHA, 2.7f).target(1).start(tweenManager);
+            if (music != null) {
+                music.setVolume(1.0f);
+                //Tween.to(music, MusicAccessor.VOLUME, 2.7f).target(0.0f).ease(Expo.IN).start(tweenManager);
+            }
             battleStatus = 1;
         } else {
             if (!tweenManager.containsTarget(transitionColor)) {
@@ -136,6 +157,13 @@ public class BattleScreen implements Screen, Move2PlayGame {
                 background = new Background();
                 generator.newMatch();
                 Tween.to(transitionColor, SpriteAcessor.ALPHA, 1.0f).target(0).delay(1).start(tweenManager);
+                
+                music.stop();
+                //tweenManager.killTarget(music);
+                music = musicUtils.nextSong();
+                //music.setVolume(0f);
+                //Tween.to(music, MusicAccessor.VOLUME, 2.7f).target(1.0f).ease(Expo.IN).start(tweenManager);
+                music.play();
             }
         }
     }
@@ -202,23 +230,6 @@ public class BattleScreen implements Screen, Move2PlayGame {
                         int score;
 
                         personagem.act(commands);
-                        /*
-                        if (target.isDead()) {
-                            targets.removeValue(target, true);
-                            tweenManager.killTarget(target, 1);
-                            if (targets.size == 0) {
-                                score = personagem.getStrength() * 3;
-                            } else {
-                                score = personagem.getStrength() * 2;
-                            }
-                        } else {
-                            score = personagem.getStrength();
-                        }
-                        if (personagem instanceof Player) {
-                            Player player = (Player) personagem;
-                            player.score += score;
-                        }*/
-
                     }
 
                     break;
@@ -316,6 +327,11 @@ public class BattleScreen implements Screen, Move2PlayGame {
         for (Character personagem : allCharacters) {
             drawing.draw(personagem);
         }
+
+        for (HitAnimation hit : hits) {
+            hit.draw(batch);
+        }
+
         transitionColor.draw(batch);
         drawing.drawScores(allCharacters);
         batch.end();

@@ -105,8 +105,6 @@ public class DrawingCharacter {
         
         float width = 100f * (timeRemaining / 6000f);
         
-        System.out.println("timeRemaining / 6000: " + timeRemaining / 6000);
-        System.out.println("width: " + width);
         
         batch.draw(ColorsUtil.GOLD, x, y, width, 10);
     }

@@ -34,6 +34,7 @@ public class PlayerGenerator {
             pyrPst.folder = "player/" + strPst[0][0];
             pyrPst.hitSounds = SoundUtil.getSounds("Audios/sounds/" + strPst[0][1]);
             pyrPst.deathSounds = SoundUtil.getSounds("Audios/sounds/" + strPst[0][2]);
+            pyrPst.targetAnimation = strPst[0][3];
             pyrPst.actionCode = strPst[1][0];
             pyrPst.deathCode = strPst[1][1];
             pyrPst.pedaladasMinimas = Integer.parseInt(strPst[2][0]);

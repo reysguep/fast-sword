@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Array;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -20,7 +21,10 @@ import java.util.logging.Logger;
  */
 public class TextureUtil {
 
-    //Creates all character animations
+    
+    public static HashMap<String, Animation> visualEffects = getVisualEffects();
+    
+//Creates all character animations
     public static MultiAnimatedSprite createAnimationsCharacter(String folder) {
 
         MultiAnimatedSprite multiAnimations;
@@ -133,5 +137,19 @@ public class TextureUtil {
 
         return animacao;
     }
-
+    
+    public static HashMap<String, Animation> getVisualEffects() {
+        String[][] dados = splitFile("Animations/visual effects/info.txt", ";");
+        HashMap<String, Animation> visualEffct = new HashMap<String, Animation>();
+        
+        for(int i = 0; i < dados.length; i++){
+            Texture texture = new Texture(Gdx.files.internal("Animations/visual effects/" + dados[i][0]) + ".png");
+            int frames = Integer.parseInt(dados[i][1]);
+            float timeBtwFrames = Float.parseFloat(dados[i][2]);
+            Animation animation = spriteSheetToAnimation(texture, frames, timeBtwFrames);
+            visualEffct.put(dados[i][0], animation);
+        }
+        
+        return visualEffct;
+    }
 }

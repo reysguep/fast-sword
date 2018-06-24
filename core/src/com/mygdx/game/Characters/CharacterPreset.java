@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.Array;
  * @author reysguep
  */
 public class CharacterPreset {
-    public String folder, actionCode, deathCode;
+    public String folder, actionCode, deathCode, targetAnimation;
     
     public Array<Sound> hitSounds, deathSounds;
     

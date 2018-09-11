@@ -33,11 +33,11 @@ public class GdxUtil {
                 secondsPerFrame = Float.parseFloat(br.readLine());
                 br.close();
             } catch (IOException ex) {
-                Logger.getLogger(MyGdxGame.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             }
 
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(MyGdxGame.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
         tr = new TextureRegion[frames];
         for (int i = 0; i < frames; i++) {
@@ -65,11 +65,11 @@ public class GdxUtil {
                 secondsPerFrame = Float.parseFloat(br.readLine());
                 br.close();
             } catch (IOException ex) {
-                Logger.getLogger(MyGdxGame.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             }
 
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(MyGdxGame.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
         tr = new TextureRegion[frames];
         for (int i = 0; i < frames; i++) {
@@ -96,11 +96,11 @@ public class GdxUtil {
                 secondsPerFrame = Float.parseFloat(br.readLine());
                 br.close();
             } catch (IOException ex) {
-                Logger.getLogger(MyGdxGame.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             }
 
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(MyGdxGame.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
         tr = new TextureRegion[frames];
         for (int i = 0; i < frames; i++) {
@@ -127,11 +127,11 @@ public class GdxUtil {
                 secondsPerFrame = Float.parseFloat(br.readLine());
                 br.close();
             } catch (IOException ex) {
-                Logger.getLogger(MyGdxGame.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             }
 
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(MyGdxGame.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
         tr = new TextureRegion[frames];
         for (int i = 0; i < frames; i++) {

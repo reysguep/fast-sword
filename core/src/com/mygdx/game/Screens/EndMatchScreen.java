@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.game.MyGdxGame;
+import com.mygdx.game.Main;
 import com.mygdx.game.Characters.Player;
 
 /**
@@ -20,12 +20,12 @@ import com.mygdx.game.Characters.Player;
  */
 public class EndMatchScreen implements Screen, Move2PlayGame{
 
-    public EndMatchScreen(MyGdxGame game, Array<Player> players) {
+    public EndMatchScreen(Main game, Array<Player> players) {
         this.game = game;
         this.players = players;
     }
     
-    private final MyGdxGame game;
+    private final Main game;
     private Texture background;
     private final Array<Player> players;
     

@@ -18,7 +18,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.game.Background;
 import com.mygdx.game.Characters.Character;
 import com.mygdx.game.Characters.Enemy;
-import com.mygdx.game.MyGdxGame;
+import com.mygdx.game.Main;
 import com.mygdx.game.Characters.Player;
 import com.mygdx.game.Team;
 import com.mygdx.game.EnemyGenerator;
@@ -43,7 +43,7 @@ import static libgdxUtils.StatusCode.*;
  */
 public class BattleScreen implements Screen, Move2PlayGame {
 
-    public BattleScreen(MyGdxGame game, Team teamA) {
+    public BattleScreen(Main game, Team teamA) {
         this.game = game;
         this.teamA = teamA;
     }
@@ -52,7 +52,7 @@ public class BattleScreen implements Screen, Move2PlayGame {
     public Array<Character> allCharacters;
     private Background background;
     private DrawingCharacter drawing;
-    private final MyGdxGame game;
+    private final Main game;
     private SpriteBatch batch;
     private EnemyGenerator generator;
     private PlayerGenerator plyGenerator;

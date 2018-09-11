@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.mygdx.game.MyGdxGame;
+import com.mygdx.game.Main;
 import com.mygdx.game.Characters.Player;
 import com.mygdx.game.PlayerGenerator;
 import com.mygdx.game.Team;
@@ -29,12 +29,12 @@ import libgdxUtils.WaitingNode;
 
 public class WaitingScreen implements Screen, Move2PlayGame {
 
-    public WaitingScreen(MyGdxGame game) {
+    public WaitingScreen(Main game) {
         this.game = game;
 
     }
 
-    private final MyGdxGame game;
+    private final Main game;
     private Music music;
     private SpriteBatch batch;
     private Texture background;

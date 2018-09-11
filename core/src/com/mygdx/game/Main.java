@@ -7,8 +7,14 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 
-public class MyGdxGame extends Game implements Move2PlayGame, ApplicationListener {
+public class Main extends Game implements Move2PlayGame, ApplicationListener {
 
+    public static final short LOADING_SCREEN = 0;
+    public static final short SPLASH_SCREEN = 1;
+    public static final short WAITING_SCREEN = 2;
+    public static final short BATTLE_SCREEN = 3;
+    public static final short FINAL_SCREEN = 4;
+    
     public Move2PlayGame eventHandler;
     private final GameSettings gs;
     private Screen previousScreen = null;
@@ -16,14 +22,19 @@ public class MyGdxGame extends Game implements Move2PlayGame, ApplicationListene
     
     //private Assets resources;
     
-    public MyGdxGame(){
+    public Main(){
         eventHandler = this;
-        gs = new GameSettings(MyGdxGame.class);
+        gs = new GameSettings(Main.class);
         //gs.loadSettings();
+    }
+    
+    public void changeScreen() {
+        
     }
     
     @Override
     public void create() {
+        Assets manager = new Assets();
         setScreen(new SplashScreen(this));
          
     }

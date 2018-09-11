@@ -4,11 +4,11 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import br.cefetmg.move2play.game.Move2PlayGame;
 import br.cefetmg.move2play.model.Player;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.mygdx.game.MyGdxGame;
+import com.mygdx.game.Main;
 
 public class DesktopLauncher implements Move2PlayGame {
 
-    private MyGdxGame gameClass;
+    private Main gameClass;
     LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 
     public static void main(String[] arg) {
@@ -18,7 +18,7 @@ public class DesktopLauncher implements Move2PlayGame {
     }
 
     public void run() {
-        gameClass = new MyGdxGame();
+        gameClass = new Main();
         config.title = gameClass.getSettings().getGameName();
         config.width = 1280;
         config.height = 720;

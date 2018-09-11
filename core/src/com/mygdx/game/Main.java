@@ -2,10 +2,12 @@ package com.mygdx.game;
 
 import com.mygdx.game.Screens.SplashScreen;
 import br.cefetmg.move2play.game.Move2PlayGame;
+import br.cefetmg.move2play.model.Player;
 import br.cefetmg.move2play.settings.GameSettings;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.utils.Array;
 
 public class Main extends Game implements Move2PlayGame, ApplicationListener {
 
@@ -134,6 +136,17 @@ public class Main extends Game implements Move2PlayGame, ApplicationListener {
             eventHandler.move(uuid,i);
         else
             System.out.println("Move from Main");
+    }
+    
+    public static Player createPlayer(int index, String name){
+        Player player;
+        player = new Player();
+        
+        player.setName(name);
+        player.setUUID("test00" + index);
+        //player.setColor(color);
+        
+        return player;
     }
 }
 

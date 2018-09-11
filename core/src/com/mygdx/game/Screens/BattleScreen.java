@@ -386,14 +386,7 @@ public class BattleScreen implements Screen, Move2PlayGame {
 
     @Override
     public void addPlayer(br.cefetmg.move2play.model.Player player) {
-        Player plyr = plyGenerator.newPlayer(player);
-
-        allCharacters.add(plyr);
-        teamA.add(plyr);
-    }
-
-    public void addPlayer(String name) {
-        Player plyr = plyGenerator.newPlayer(name);
+        Player plyr = plyGenerator.newRandomPlayer(player);
 
         allCharacters.add(plyr);
         teamA.add(plyr);

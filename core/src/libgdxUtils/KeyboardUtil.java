@@ -3,6 +3,7 @@ package libgdxUtils;
 import br.cefetmg.move2play.game.Move2PlayGame;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
+import com.mygdx.game.Main;
 import com.mygdx.game.Screens.BattleScreen;
 import com.mygdx.game.Screens.EndMatchScreen;
 import com.mygdx.game.Screens.WaitingScreen;
@@ -25,22 +26,22 @@ public class KeyboardUtil implements InputProcessor {
             WaitingScreen screen = (WaitingScreen) screenM;
             switch (keycode) {
                 case Keys.U:
-                    screen.addPlayer("Lancelot");
+                    screen.addPlayer(Main.createPlayer(0, "Lancelot"));
                     break;
                 case Keys.I:
-                    screen.addPlayer("Elliot");
+                    screen.addPlayer(Main.createPlayer(1, "Eliot"));
                     break;
                 case Keys.O:
-                    screen.addPlayer("Noah");
+                    screen.addPlayer(Main.createPlayer(2, "Noah"));
                     break;
                 case Keys.P:
-                    screen.addPlayer("General");
+                    screen.addPlayer(Main.createPlayer(3, "General"));
                     break;
                 case Keys.K:
-                    screen.removePlayer("Lancelot");
+                    //screen.removePlayer("Lancelot");
                     break;
                 case Keys.L:
-                    screen.removePlayer("Elliot");
+                    //screen.removePlayer("Elliot");
                     break;
                 case Keys.ENTER:
                     screen.startMatch();

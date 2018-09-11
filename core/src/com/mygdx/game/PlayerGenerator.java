@@ -21,7 +21,7 @@ public class PlayerGenerator {
 
     private final Array<PlayerPreset> presets;
 
-    private Array getPresets() {
+    private static Array getPresets() {
         Array psts = new Array();
 
         File folder = new File("Presets/players");
@@ -48,13 +48,14 @@ public class PlayerGenerator {
         return psts;
     }
     
-    public Player newPlayer(br.cefetmg.move2play.model.Player player){
+    public Player newRandomPlayer(br.cefetmg.move2play.model.Player player){
         Player plyr = new Player(player, presets.random());
         
         return plyr;
     }
-    public Player newPlayer(String name){
-        Player plyr = new Player(name, presets.random());
+    
+    public Player newRandomPlayer(br.cefetmg.move2play.model.Player player, int pClass){
+        Player plyr = new Player(player, presets.get(pClass));
         
         return plyr;
     }

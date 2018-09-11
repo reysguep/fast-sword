@@ -59,7 +59,7 @@ public class WaitingScreen implements Screen, Move2PlayGame {
         FreeTypeFontGenerator generatorW = new FreeTypeFontGenerator(Gdx.files.internal("Fonts/VeniceClassic.ttf"));
         FreeTypeFontParameter parameterW = new FreeTypeFontParameter();
         parameterW.size = 60;
-        parameterW.borderWidth = 5;
+        parameterW.borderWidth = 3;
         waitingMessage = generatorW.generateFont(parameterW);
 
         Gdx.input.setInputProcessor(new KeyboardUtil(this));

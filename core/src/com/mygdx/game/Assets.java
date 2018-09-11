@@ -23,6 +23,7 @@ public class Assets {
     
     public ArrayList<String> load(String path){
         ArrayList<String> names = FileUtil.allFileNames(path, 0, true);
+        manager.load("Animations/star/frame_00_delay-0.01s.png", Texture.class);
         for(String file : names) {
             manager.load(file, Texture.class);
         }

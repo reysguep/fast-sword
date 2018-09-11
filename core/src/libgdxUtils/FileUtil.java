@@ -28,7 +28,7 @@ public class FileUtil {
         for(File file : files) {
             String name;
             if(withPath == true){
-                name = file.getPath();
+                name = file.getAbsolutePath();
             } else {
                 name = file.getName();
             }

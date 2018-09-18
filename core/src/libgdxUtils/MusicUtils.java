@@ -23,7 +23,6 @@ public class MusicUtils {
 
         for (File file : listOfFiles) {
             musics.add(file.getName());
-            System.out.println(file.getName());
         }
     }
 

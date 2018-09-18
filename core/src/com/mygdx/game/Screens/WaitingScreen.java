@@ -16,22 +16,12 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFont
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.game.Main;
-import com.mygdx.game.Characters.Player;
-import com.mygdx.game.PlayerGenerator;
-import com.mygdx.game.Team;
-import java.util.Random;
-import libgdxUtils.AnimatedSprite;
+import libgdxUtils.KeyboardUtil;
 
 /**
  *
  * @author reysguep
  */
-import libgdxUtils.CircularLinkedList;
-import libgdxUtils.KeyboardUtil;
-import libgdxUtils.PlayersWaiting;
-import libgdxUtils.VideoUtil;
-import libgdxUtils.WaitingNode;
-
 public class WaitingScreen implements Screen, Move2PlayGame {
 
     public WaitingScreen(Main game) {
@@ -45,22 +35,17 @@ public class WaitingScreen implements Screen, Move2PlayGame {
     private Texture background;
     private BitmapFont waitingMessage;
     private BitmapFont playerMessage;
-    private CircularLinkedList<String> cll;
     private long startTime;
     private String dot = "";
     private GlyphLayout layout;
     private Animation<TextureRegion> star;
-    
+
     private Array<br.cefetmg.move2play.model.Player> waitingPlayers;
-    
-    private PlayersWaiting players;
-    private PlayerGenerator plyGenerator;
 
     @Override
     public void show() {
-        plyGenerator = new PlayerGenerator();
         waitingPlayers = new Array<br.cefetmg.move2play.model.Player>();
-        
+
         layout = new GlyphLayout();
         music = Gdx.audio.newMusic(Gdx.files.internal("Audios/musics/evocation.mp3"));
         background = new Texture(Gdx.files.internal("Animations/waitingBG.jpg"));
@@ -71,33 +56,52 @@ public class WaitingScreen implements Screen, Move2PlayGame {
         parameterW.size = 60;
         parameterW.borderWidth = 3;
         waitingMessage = generatorW.generateFont(parameterW);
-        
+
         FreeTypeFontGenerator generatorP = new FreeTypeFontGenerator(Gdx.files.internal("Fonts/VeniceClassic.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameterP = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        
+
         parameterP.size = 40;
         parameterP.borderWidth = 3;
         playerMessage = generatorP.generateFont(parameterP);
 
         Gdx.input.setInputProcessor(new KeyboardUtil(this));
 
-        players = new PlayersWaiting(layout);
-
-        cll = new CircularLinkedList<String>();
-        cll.add("");
-        cll.add(".");
-        cll.add("..");
-        cll.add("...");
-
         music.setLooping(true);
-
         music.play();
         startTime = TimeUtils.millis();
-        
-        star = VideoUtil.imageSequenceToAnimation("Animations/star", 0.025f);
-        star.setPlayMode(Animation.PlayMode.LOOP);
-        
+
+        createStar();
+
         game.eventHandler = (Move2PlayGame) this;
+    }
+
+    private void createStar() {
+        for (int i = 1; i <= 26; i++) {
+            game.assetManager.load("Animations/star/" + i + ".png", Texture.class);
+        }
+        game.assetManager.finishLoading();
+        TextureRegion[] frames = new TextureRegion[26];
+        for (int i = 1; i <= 26; i++) {
+            String frameName = "Animations/star/" + i + ".png";
+            frames[i - 1] = new TextureRegion(game.assetManager.get(
+                    frameName, Texture.class));
+        }
+        Animation<TextureRegion> animation = new Animation<TextureRegion>(0.04f, frames);
+
+        star = new Animation<TextureRegion>(0.01f, frames);
+        star.setPlayMode(Animation.PlayMode.LOOP);
+    }
+
+    private void updateDots() {
+        if ("".equals(dot)) {
+            dot = ".";
+        } else if (".".equals(dot)) {
+            dot = "..";
+        } else if("..".equals(dot)) {
+            dot = "...";
+        } else if("...".equals(dot)) {
+            dot = "";
+        }
     }
 
     @Override
@@ -116,7 +120,7 @@ public class WaitingScreen implements Screen, Move2PlayGame {
     private void drawWaitingMessage() {
         int x, y;
         if (TimeUtils.timeSinceMillis(startTime) >= 0.5 * 1000) {
-            dot = cll.get();
+            updateDots();
             startTime = TimeUtils.millis();
         }
         CharSequence text = "Waiting players";
@@ -125,10 +129,10 @@ public class WaitingScreen implements Screen, Move2PlayGame {
         x = (int) ((1280 / 2) - (layout.width / 2));
         waitingMessage.draw(batch, text + dot, x, y);
     }
-    
+
     private void drawWP(float delta) {
         int y = 500;
-        for(br.cefetmg.move2play.model.Player player : waitingPlayers) {
+        for (br.cefetmg.move2play.model.Player player : waitingPlayers) {
             batch.draw(star.getKeyFrame(delta), 460, y - 25, 30f, 30f);
             layout.setText(playerMessage, player.getName());
             playerMessage.draw(batch, player.getName(), 500, y);
@@ -163,12 +167,11 @@ public class WaitingScreen implements Screen, Move2PlayGame {
         playerMessage.dispose();
         music.dispose();
         batch.dispose();
-        players.dispose();
     }
 
     @Override
     public void initGame() {
-        
+
     }
 
     @Override
@@ -179,12 +182,7 @@ public class WaitingScreen implements Screen, Move2PlayGame {
     @Override
     public void startMatch() {
         if (waitingPlayers.size >= 1) {
-            Team teamA = new Team('a');
-            for (br.cefetmg.move2play.model.Player player : waitingPlayers) {
-                teamA.addMember(plyGenerator.newRandomPlayer(player));
-            }
-
-            game.setScreen(new BattleScreen(game, teamA));
+            game.setScreen(new BattleScreen(game, waitingPlayers));
         }
     }
 

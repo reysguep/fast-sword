@@ -4,3 +4,4 @@ attack random enemy;kill random enemy
 100;200
 250
 60
+85

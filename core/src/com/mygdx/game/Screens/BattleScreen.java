@@ -15,7 +15,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.mygdx.game.Background;
+import com.mygdx.game.BackgroundManager;
 import com.mygdx.game.Characters.Character;
 import com.mygdx.game.Characters.Enemy;
 import com.mygdx.game.Main;
@@ -43,14 +43,18 @@ import static libgdxUtils.StatusCode.*;
  */
 public class BattleScreen implements Screen, Move2PlayGame {
 
-    public BattleScreen(Main game, Team teamA) {
+    public BattleScreen(Main game, Array<br.cefetmg.move2play.model.Player> waitingPlayers) {
         this.game = game;
-        this.teamA = teamA;
+        teamA = new Team('a');
+        plyGenerator = new PlayerGenerator();
+        for (br.cefetmg.move2play.model.Player player : waitingPlayers) {
+            teamA.addMember(plyGenerator.newRandomPlayer(player));
+        }
     }
 
     public Team teamA, teamB;
     public Array<Character> allCharacters;
-    private Background background;
+    private BackgroundManager backgroundManager;
     private DrawingCharacter drawing;
     private final Main game;
     private SpriteBatch batch;
@@ -72,12 +76,18 @@ public class BattleScreen implements Screen, Move2PlayGame {
     public void show() {
         battleStatus = 0;
         phase = 1;
+        
+        musicUtils = new MusicUtils("Audios/musics/battle screen");
+        music = musicUtils.nextSong();
+        music.play();
 
         tweenManager = new TweenManager();
-        Tween.setCombinedAttributesLimit(4);
+        Tween.setCombinedAttributesLimit(5);
         Tween.registerAccessor(Character.class, new CharacterAccessor());
+        Tween.registerAccessor(music.getClass(), new MusicAccessor());
         Tween.registerAccessor(Sprite.class, new SpriteAcessor());
-        Tween.registerAccessor(Music.class, new MusicAccessor());
+        
+//        System.out.println(Tween.getRegisteredAccessor(music.getClass()));
 
         teamB = new Team('b');
         allCharacters = new Array<Character>();
@@ -88,11 +98,11 @@ public class BattleScreen implements Screen, Move2PlayGame {
         transitionColor.setSize(1280, 720);
         transitionColor.setAlpha(0);
 
-        background = new Background();
+        backgroundManager = new BackgroundManager();
+        backgroundManager.nextBackground();
         drawing = new DrawingCharacter(batch);
 
         generator = new EnemyGenerator(this);
-        plyGenerator = new PlayerGenerator();
 
         game.eventHandler = this;
         Gdx.input.setInputProcessor(new KeyboardUtil(this));
@@ -100,10 +110,6 @@ public class BattleScreen implements Screen, Move2PlayGame {
         for (Character chr : teamA) {
             chr.setSize(280, 350);
         }
-
-        musicUtils = new MusicUtils("Audios/musics/battle screen");
-        music = musicUtils.nextSong();
-        music.play();
 
         teamA.get(0).health = 1;
         commands = new Commands(this);
@@ -136,10 +142,8 @@ public class BattleScreen implements Screen, Move2PlayGame {
                 }
             }
             Tween.to(transitionColor, SpriteAcessor.ALPHA, 2.7f).target(1).start(tweenManager);
-            if (music != null) {
-                music.setVolume(1.0f);
-                //Tween.to(music, MusicAccessor.VOLUME, 2.7f).target(0.0f).ease(Expo.IN).start(tweenManager);
-            }
+            Tween.to(music, MusicAccessor.VOLUME, 2.7f).target(0.0f).start(tweenManager);
+
             battleStatus = 1;
         } else {
             if (!tweenManager.containsTarget(transitionColor)) {
@@ -154,15 +158,13 @@ public class BattleScreen implements Screen, Move2PlayGame {
                     }
                 }
                 battleStatus = 0;
-                background = new Background();
+                backgroundManager.nextBackground();
                 generator.newMatch();
                 Tween.to(transitionColor, SpriteAcessor.ALPHA, 1.0f).target(0).delay(1).start(tweenManager);
-                
-                music.stop();
-                //tweenManager.killTarget(music);
+
                 music = musicUtils.nextSong();
-                //music.setVolume(0f);
-                //Tween.to(music, MusicAccessor.VOLUME, 2.7f).target(1.0f).ease(Expo.IN).start(tweenManager);
+                music.setVolume(0f);
+                Tween.to(music, MusicAccessor.VOLUME, 2.7f).target(1.0f).ease(Expo.IN).start(tweenManager);
                 music.play();
             }
         }
@@ -216,7 +218,7 @@ public class BattleScreen implements Screen, Move2PlayGame {
                     if (personagem.canAttack()) {
                         if (!(targets.size == 0)) {
                             personagem.setStatus(GOING);
-                            Tween.to(personagem, CharacterAccessor.POS_X, 1.5f).target(personagem.getX() + 100 * moveDirection).delay(0).start(tweenManager);
+                            personagem.move(GOING, tweenManager, moveDirection);
                         }
                     }
                     break;
@@ -225,7 +227,7 @@ public class BattleScreen implements Screen, Move2PlayGame {
                     if (targets.size == 0) {
                         tweenManager.killTarget(personagem, 1);
                         personagem.setStatus(RETURNING);
-                        Tween.to(personagem, CharacterAccessor.POS_X, 1).target(personagem.orgX).delay(0).start(tweenManager);
+                        personagem.move(RETURNING, tweenManager, moveDirection);
                     } else if (personagem.getX() == personagem.orgX + 100 * moveDirection) {
                         int score;
 
@@ -237,7 +239,7 @@ public class BattleScreen implements Screen, Move2PlayGame {
                 case ACTING:
                     if (personagem.getAnimations().isAnimationFinished()) {
                         personagem.setStatus(RETURNING);
-                        Tween.to(personagem, CharacterAccessor.POS_X, 1).target(personagem.orgX).ease(Linear.INOUT).start(tweenManager);
+                        personagem.move(RETURNING, tweenManager, moveDirection);
                     }
                     break;
 
@@ -268,7 +270,7 @@ public class BattleScreen implements Screen, Move2PlayGame {
                     if (personagem.getAnimations().isAnimationFinished()) {
                         personagem.getAnimations().getAnimation().setPlayMode(Animation.PlayMode.NORMAL);
                         personagem.setStatus(RETURNING);
-                        Tween.to(personagem, CharacterAccessor.POS_X, 1).target(personagem.orgX).start(tweenManager);
+                        personagem.move(RETURNING, tweenManager, moveDirection);
                     }
                     break;
             }
@@ -322,7 +324,7 @@ public class BattleScreen implements Screen, Move2PlayGame {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
 
-        background.draw(batch);
+        backgroundManager.draw(batch);
 
         for (Character personagem : allCharacters) {
             drawing.draw(personagem);

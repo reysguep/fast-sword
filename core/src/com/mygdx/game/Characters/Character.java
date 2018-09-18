@@ -1,5 +1,7 @@
 package com.mygdx.game.Characters;
 
+import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -9,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import libgdxUtils.AnimatedSprite;
 import libgdxUtils.AnimationCode;
+import libgdxUtils.CharacterAccessor;
 import libgdxUtils.Commands;
 import libgdxUtils.MultiAnimatedSprite;
 import libgdxUtils.StatusCode;
@@ -19,29 +22,19 @@ import libgdxUtils.exceptions.CommandException;
  *
  * @author reysguep
  */
- public abstract class Character {
+public abstract class Character {
 
     public Character(String name, CharacterPreset preset, int maxHealth, int strength) {
+        this(name, preset);
         this.maxHealth = maxHealth;
-        this.health = this.maxHealth;
         this.strength = strength;
-        this.animations = TextureUtil.createAnimationsCharacter("Animations/" + preset.folder);
-        animations.setSize(preset.width, preset.height);
-        this.name = name;
-        status = 1;
-
-        this.hitSounds = preset.hitSounds;
-        this.deathSounds = preset.deathSounds;
-        
-        this.actionCode = preset.actionCode;
-        this.deathCode = preset.deathCode;
-        this.targetAnimation = TextureUtil.visualEffects.get(preset.targetAnimation);
     }
 
     public Character(String name, CharacterPreset preset) {
         this.maxHealth = preset.maxHealth;
         this.health = this.maxHealth;
         this.strength = preset.maxStr;
+        this.speed = preset.speed;
         this.animations = TextureUtil.createAnimationsCharacter("Animations/" + preset.folder);
         animations.setSize(preset.width, preset.height);
         this.name = name;
@@ -49,10 +42,9 @@ import libgdxUtils.exceptions.CommandException;
 
         this.hitSounds = preset.hitSounds;
         this.deathSounds = preset.deathSounds;
-        
+
         this.actionCode = preset.actionCode;
         this.deathCode = preset.deathCode;
-        
         this.targetAnimation = TextureUtil.visualEffects.get(preset.targetAnimation);
     }
 
@@ -63,11 +55,12 @@ import libgdxUtils.exceptions.CommandException;
     private final Array<Sound> hitSounds, deathSounds;
 
     private int status;
+    private int speed;
     public int orgX, orgY;
 
     public String name;
     public char team;
-    
+
     public final String actionCode, deathCode;
     public final Animation targetAnimation;
 
@@ -77,20 +70,20 @@ import libgdxUtils.exceptions.CommandException;
         return health <= 0;
     }
 
-    public void act(Commands commands){
+    public void act(Commands commands) {
         setStatus(StatusCode.ACTING);
         try {
             commands.call(actionCode, this);
         } catch (CommandException ex) {
             Logger.getLogger(Character.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         act();
         setAnimation(AnimationCode.ATTACKING);
         hitSounds.random().play();
     }
+
     protected abstract void act();
-    
 
     public void beAttacked(int damage, Commands commands) {
         health -= damage;
@@ -172,6 +165,10 @@ import libgdxUtils.exceptions.CommandException;
     public MultiAnimatedSprite getAnimations() {
         return animations;
     }
+    
+    public int getSpeed() {
+        return speed;
+    }
 
     public boolean compareAnimation(String animation) {
         return animations.getAnimation() == animations.getAnimation(animation);
@@ -226,4 +223,26 @@ import libgdxUtils.exceptions.CommandException;
     }
 
     public abstract float getProgress();
+
+    public void move(int settedStatus, TweenManager tween, int moveDirection) {
+        int destiny, distance;
+        float time;
+
+        switch (settedStatus) {
+            case StatusCode.RETURNING:
+                destiny = orgX;
+                break;
+
+            case StatusCode.GOING:
+                destiny = orgX + 100 * moveDirection;
+                break;
+
+            default:
+                return;
+        }
+
+        distance = Math.abs((int) this.getX() - destiny);
+        time = distance / speed;
+        Tween.to(this, CharacterAccessor.POS_X, time).target(destiny).delay(0).start(tween);
+    }
 }

@@ -42,6 +42,7 @@ public class PlayerGenerator {
             pyrPst.height = Integer.parseInt(strPst[3][1]);
             pyrPst.maxHealth = Integer.parseInt(strPst[4][0]);
             pyrPst.maxStr = Integer.parseInt(strPst[5][0]);
+            pyrPst.speed = Integer.parseInt(strPst[6][0]);
             
             psts.add(pyrPst);
         }
@@ -49,8 +50,9 @@ public class PlayerGenerator {
     }
     
     public Player newRandomPlayer(br.cefetmg.move2play.model.Player player){
-        Player plyr = new Player(player, presets.random());
-        
+        PlayerPreset choosedPreset = presets.random();
+        Player plyr = new Player(player, choosedPreset);
+
         return plyr;
     }
     

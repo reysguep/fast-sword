@@ -29,7 +29,7 @@ public class KeyboardUtil implements InputProcessor {
                     screen.addPlayer(Main.createPlayer(0, "Lancelot"));
                     break;
                 case Keys.I:
-                    screen.addPlayer(Main.createPlayer(1, "Eliot"));
+                    screen.addPlayer(Main.createPlayer(1, "Elliot"));
                     break;
                 case Keys.O:
                     screen.addPlayer(Main.createPlayer(2, "Noah"));

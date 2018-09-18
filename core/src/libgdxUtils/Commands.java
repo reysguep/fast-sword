@@ -168,12 +168,19 @@ public class Commands {
     }
 
     private void heal(Character chr, Character target) {
+        int score = target.getMaxHealth() - target.getHealth();
+        
         if (!target.isDead()) {
             target.health += chr.getStrength();
             if (target.health > target.getMaxHealth()) {
                 target.health = target.getMaxHealth();
             }
             System.out.println(chr.getName() + " healed " + target.getName() + ".");
+        }
+        
+        if(chr instanceof Player) {
+            Player player = (Player) chr;
+            player.score += score / 3;
         }
         addHitAnimation(chr, target);
     }

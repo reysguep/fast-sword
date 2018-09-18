@@ -14,5 +14,6 @@ public class CharacterPreset {
     
     public int width, height,
             maxHealth,
-            maxStr;
+            maxStr,
+            speed;
 }

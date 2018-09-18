@@ -92,6 +92,7 @@ public class EnemyGenerator {
             enemyPst.minTTA = Float.parseFloat(strPst[5][0]);
             enemyPst.maxTTA = Float.parseFloat(strPst[5][1]);
             enemyPst.name = strPst[6][0];
+            enemyPst.speed = Integer.parseInt(strPst[7][0]);
             
             presets.add(enemyPst);
         }

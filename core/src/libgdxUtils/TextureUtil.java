@@ -21,9 +21,8 @@ import java.util.logging.Logger;
  */
 public class TextureUtil {
 
-    
     public static HashMap<String, Animation> visualEffects = getVisualEffects();
-    
+
 //Creates all character animations
     public static MultiAnimatedSprite createAnimationsCharacter(String folder) {
 
@@ -67,7 +66,7 @@ public class TextureUtil {
         try {
             fr = new FileReader(folder);
             br = new BufferedReader(fr);
-            
+
             line = br.readLine();
             while (line != null) {
                 temp = line.split(spliter);
@@ -80,9 +79,9 @@ public class TextureUtil {
         } catch (IOException ex) {
             Logger.getLogger(TextureUtil.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         String[][] strArray = new String[array.size()][];
-        for(int i = 0; i < array.size(); i ++){
+        for (int i = 0; i < array.size(); i++) {
             strArray[i] = array.get(i);
         }
         return strArray;
@@ -137,19 +136,46 @@ public class TextureUtil {
 
         return animacao;
     }
-    
+
     public static HashMap<String, Animation> getVisualEffects() {
         String[][] dados = splitFile("Animations/visual effects/info.txt", ";");
         HashMap<String, Animation> visualEffct = new HashMap<String, Animation>();
-        
-        for(int i = 0; i < dados.length; i++){
+
+        for (int i = 0; i < dados.length; i++) {
             Texture texture = new Texture(Gdx.files.internal("Animations/visual effects/" + dados[i][0]) + ".png");
             int frames = Integer.parseInt(dados[i][1]);
             float timeBtwFrames = Float.parseFloat(dados[i][2]);
             Animation animation = spriteSheetToAnimation(texture, frames, timeBtwFrames);
             visualEffct.put(dados[i][0], animation);
         }
-        
+
         return visualEffct;
+    }
+
+    private static Animation<TextureRegion> sheetToAnimation(Texture texture, int rows, int columns,
+            float frameDuration, int totalFrames) {
+        Animation<TextureRegion> animation;
+        TextureRegion[][] tmp;
+        TextureRegion[] sheetRegion;
+
+        tmp = TextureRegion.split(texture, texture.getWidth() / columns,
+                texture.getHeight() / rows);
+
+        sheetRegion = new TextureRegion[totalFrames];
+
+        int index = 0;
+        for (TextureRegion[] row : tmp) {
+            for (TextureRegion column : row) {
+                sheetRegion[index] = column;
+                index++;
+                if (index >= totalFrames) {
+                    break;
+                }
+            }
+        }
+
+        animation = new Animation<TextureRegion>(frameDuration, sheetRegion);
+
+        return animation;
     }
 }

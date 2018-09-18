@@ -7,6 +7,7 @@ import br.cefetmg.move2play.settings.GameSettings;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.Array;
 
 public class Main extends Game implements Move2PlayGame, ApplicationListener {
@@ -20,7 +21,7 @@ public class Main extends Game implements Move2PlayGame, ApplicationListener {
     public Move2PlayGame eventHandler;
     private final GameSettings gs;
     private Screen previousScreen = null;
-    
+    public AssetManager assetManager;
     
     //private Assets resources;
     
@@ -28,6 +29,7 @@ public class Main extends Game implements Move2PlayGame, ApplicationListener {
         eventHandler = this;
         gs = new GameSettings(Main.class);
         //gs.loadSettings();
+        assetManager = new AssetManager();
     }
     
     public void changeScreen() {
@@ -36,7 +38,6 @@ public class Main extends Game implements Move2PlayGame, ApplicationListener {
     
     @Override
     public void create() {
-        Assets manager = new Assets();
         setScreen(new SplashScreen(this));
          
     }

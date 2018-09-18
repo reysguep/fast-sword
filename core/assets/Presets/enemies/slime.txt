@@ -1,7 +1,8 @@
 blob;hit4;death1;splash
 attack random enemy;heal all enemy
-300;375
-40;53
-800;1000
-7;10
-Slime
+300;375;	altura/largura
+40;53;		força
+800;1000;	vida
+7;10;		tempo para atacar
+Slime;		nome
+60;		velocidade

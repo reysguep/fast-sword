@@ -14,6 +14,7 @@ public class Player extends Character implements Comparable<Player>{
         pedaladasDadas = 0;
         this.pedaladasMinimas = preset.pedaladasMinimas;
         uuid = player.getUUID();
+        
     }
 
     public Player(String name, PlayerPreset pst) {

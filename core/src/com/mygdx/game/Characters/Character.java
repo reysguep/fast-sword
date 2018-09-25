@@ -46,8 +46,10 @@ public abstract class Character {
         this.actionCode = preset.actionCode;
         this.deathCode = preset.deathCode;
         this.targetAnimation = TextureUtil.visualEffects.get(preset.targetAnimation);
+        this.preset = preset;
     }
 
+    public CharacterPreset preset;
     public int health;
     protected int maxHealth;
     protected int strength;

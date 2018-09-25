@@ -53,7 +53,6 @@ public class LoadingScreen implements Screen {
     public void render(float f) {
         if (assetManager.update()) {
             completed = true;
-            System.out.println("CARREGADO!");
         } else {
             float width = assetManager.getProgress() * 400;
             loadingBar.setSize(width, loadingBar.getHeight());

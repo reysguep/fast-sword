@@ -47,8 +47,9 @@ public class BattleScreen implements Screen, Move2PlayGame {
         this.game = game;
         teamA = new Team('a');
         plyGenerator = new PlayerGenerator();
-        for (br.cefetmg.move2play.model.Player player : waitingPlayers) {
-            teamA.addMember(plyGenerator.newRandomPlayer(player));
+        Array<Player> players = plyGenerator.sortClasses(waitingPlayers);
+        for(Player player : players) {
+            teamA.addMember(player);
         }
     }
 
@@ -111,7 +112,6 @@ public class BattleScreen implements Screen, Move2PlayGame {
             chr.setSize(280, 350);
         }
 
-        teamA.get(0).health = 1;
         commands = new Commands(this);
         generator.newMatch();
 

@@ -3,9 +3,11 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.Characters.CharacterPreset;
 import com.mygdx.game.Characters.Player;
 import com.mygdx.game.Characters.PlayerPreset;
 import java.io.File;
+import java.util.Random;
 import libgdxUtils.SoundUtil;
 import libgdxUtils.TextureUtil;
 
@@ -60,5 +62,56 @@ public class PlayerGenerator {
         Player plyr = new Player(player, presets.get(pClass));
         
         return plyr;
+    }
+    
+    public Array<Player> sortClasses(Array<br.cefetmg.move2play.model.Player> players) {
+        Array<Player> sortedPlayers = new Array<Player>();
+        for(br.cefetmg.move2play.model.Player plyr : players) {
+            int chosenClass = classesDiagram(sortedPlayers);
+            Player player = newRandomPlayer(plyr, chosenClass);
+            sortedPlayers.add(player);
+        }
+        
+        return sortedPlayers;
+    }
+    
+    private int classesDiagram(Array<Player> sortedPlayers) {
+        Random random = new Random();
+        int chosenN;
+        int chosenClass;
+        Array<Integer> possiblePresets = new Array<Integer>();
+        
+        for(CharacterPreset preset : presets) {
+            int n = 0; //players who use this preset
+            int presetNumber = presetToNumber(preset);
+            
+            for(Player player : sortedPlayers) {
+                int playerPreset = presetToNumber(player.preset);
+                if(presetNumber == playerPreset) {
+                    n++;
+                }
+            }
+            
+            if(presetNumber == 1 && sortedPlayers.size == 3 && n == 0) {
+                return 1;
+            }
+            if((n < 2 && presetNumber != 1) || presetNumber == 1 && sortedPlayers.size > 0 && n == 0) {
+                possiblePresets.add(presetNumber);
+            }
+        }
+
+        chosenN = random.nextInt(possiblePresets.size);
+        chosenClass = possiblePresets.get(chosenN);
+        
+        return chosenClass;
+    }
+    
+    public int presetToNumber(CharacterPreset preset) {
+        for(int i = 0; i < presets.size; i++) {
+            if(preset.folder.equals(presets.get(i).folder)) {
+                return i;
+            }
+        }
+        return 0;
     }
 }

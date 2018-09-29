@@ -103,7 +103,7 @@ public class BattleScreen implements Screen, Move2PlayGame {
         backgroundManager.nextBackground();
         drawing = new DrawingCharacter(batch);
 
-        generator = new EnemyGenerator(this);
+        generator = new EnemyGenerator(this, 1);
 
         game.eventHandler = this;
         Gdx.input.setInputProcessor(new KeyboardUtil(this));

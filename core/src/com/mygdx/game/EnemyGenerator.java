@@ -5,6 +5,7 @@ import com.mygdx.game.Characters.EnemyPreset;
 import com.mygdx.game.Screens.BattleScreen;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 import libgdxUtils.SoundUtil;
 import libgdxUtils.TextureUtil;
@@ -15,70 +16,87 @@ import libgdxUtils.TextureUtil;
  */
 public class EnemyGenerator {
 
-    public EnemyGenerator(BattleScreen screen) {
+    public EnemyGenerator(BattleScreen screen, int interval) {
         this.screen = screen;
+        this.interval = interval;
+        this.currentInterval = 0;
+        this.playedEnemies = 0;
 
         presets = getPresets();
+        Collections.shuffle(presets);
     }
 
     private final BattleScreen screen;
     private final ArrayList<EnemyPreset> presets;
+
+    private final int interval;
+    private int currentInterval;
+
+    private int playedEnemies;
 
     public void newMatch() {
         Random random;
         int nEnemies;
         int nPlayers = 0;
 
-        for(com.mygdx.game.Characters.Character chr : screen.allCharacters){
-            if(chr.team == 'a')
-                nPlayers++;
-        }
-        random = new Random();
-        nEnemies = nPlayers - random.nextInt(nPlayers);
+        if (currentInterval == 0 && playedEnemies < presets.size()) {
+            generate(playedEnemies);
+            currentInterval = interval;
+            playedEnemies++;
+        } else {
+            for (com.mygdx.game.Characters.Character chr : screen.allCharacters) {
+                if (chr.team == 'a') {
+                    nPlayers++;
+                }
+            }
+            random = new Random();
+            nEnemies = nPlayers - random.nextInt(nPlayers);
+            int enemyNumber;
 
-        for (int i = 0; i < nEnemies; i++) {
-            generate();
+            for (int i = 0; i < nEnemies; i++) {
+                enemyNumber = random.nextInt(playedEnemies);
+                generate(enemyNumber);
+            }
+            
+            currentInterval--;
         }
     }
 
-    private void generate() {
+    private void generate(int presetNumber) {
         Random random;
         random = new Random();
-        int sortedPst;
         EnemyPreset preset;
         int health, strength;
         float timeToAttack;
         Enemy enemy;
 
-        sortedPst = random.nextInt(presets.size());
-        preset = presets.get(sortedPst);
-        
-        
+        preset = presets.get(presetNumber);
+
         health = random.nextInt(preset.maxHealth - preset.minHealth) + preset.minHealth;
         strength = random.nextInt(preset.maxStr - preset.minStr) + preset.minStr;
-        timeToAttack = random.nextInt((int)(preset.maxTTA - preset.minTTA) * 10) / 10 + preset.maxTTA;
-        
+        timeToAttack = random.nextInt((int) (preset.maxTTA - preset.minTTA) * 10) / 10 + preset.maxTTA;
+
         enemy = new Enemy(preset, health, strength, timeToAttack);
-        
+
         enemy.setSize(preset.width, preset.height);
-        
+
         screen.teamB.addMember(enemy);
         screen.allCharacters.add(enemy);
     }
 
     private static ArrayList<EnemyPreset> getPresets() {
         ArrayList<EnemyPreset> presets = new ArrayList<EnemyPreset>();
-        
+
         File folder = new File("Presets/enemies");
         File[] listOfFiles = folder.listFiles();
-        
+
         for (File file : listOfFiles) {
             String[][] strPst = TextureUtil.splitFile("Presets/enemies/" + file.getName(), ";");
             EnemyPreset enemyPst = new EnemyPreset();
-            
+
             enemyPst.hitSounds = SoundUtil.getSounds("Audios/sounds/" + strPst[0][1]);
             enemyPst.deathSounds = SoundUtil.getSounds("Audios/sounds/" + strPst[0][2]);
-            
+
             enemyPst.folder = "enemies/" + strPst[0][0];
             enemyPst.targetAnimation = strPst[0][3];
             enemyPst.actionCode = strPst[1][0];
@@ -93,12 +111,10 @@ public class EnemyGenerator {
             enemyPst.maxTTA = Float.parseFloat(strPst[5][1]);
             enemyPst.name = strPst[6][0];
             enemyPst.speed = Integer.parseInt(strPst[7][0]);
-            
+
             presets.add(enemyPst);
         }
-        
-        
-        
+
         return presets;
     }
 }

@@ -11,11 +11,13 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.mygdx.game.BackgroundManager;
+import com.esotericsoftware.spine.SkeletonMeshRenderer;
+import com.mygdx.game.managers.BackgroundManager;
 import com.mygdx.game.Characters.Character;
 import com.mygdx.game.Characters.Enemy;
 import com.mygdx.game.Main;
@@ -28,13 +30,13 @@ import java.util.ArrayList;
 import java.util.Random;
 import libgdxUtils.AnimationCode;
 import libgdxUtils.DrawingCharacter;
-import libgdxUtils.CharacterAccessor;
+import com.mygdx.game.accessors.CharacterAccessor;
 import libgdxUtils.ColorsUtil;
 import libgdxUtils.Commands;
 import libgdxUtils.KeyboardUtil;
-import libgdxUtils.MusicAccessor;
+import com.mygdx.game.accessors.MusicAccessor;
 import libgdxUtils.MusicUtils;
-import libgdxUtils.SpriteAcessor;
+import com.mygdx.game.accessors.SpriteAcessor;
 import static libgdxUtils.StatusCode.*;
 
 /**
@@ -58,7 +60,8 @@ public class BattleScreen implements Screen, Move2PlayGame {
     private BackgroundManager backgroundManager;
     private DrawingCharacter drawing;
     private final Main game;
-    private SpriteBatch batch;
+    private PolygonSpriteBatch batch;
+    private SkeletonMeshRenderer renderer;
     private EnemyGenerator generator;
     private PlayerGenerator plyGenerator;
     private MusicUtils musicUtils;
@@ -94,23 +97,20 @@ public class BattleScreen implements Screen, Move2PlayGame {
         allCharacters = new Array<Character>();
 
         allCharacters.addAll(teamA);
-        batch = new SpriteBatch();
+        batch = new PolygonSpriteBatch();
+        renderer = new SkeletonMeshRenderer();
         transitionColor = new Sprite(ColorsUtil.BLACK);
         transitionColor.setSize(1280, 720);
         transitionColor.setAlpha(0);
 
         backgroundManager = new BackgroundManager();
         backgroundManager.nextBackground();
-        drawing = new DrawingCharacter(batch);
+        drawing = new DrawingCharacter(batch, renderer);
 
         generator = new EnemyGenerator(this, 1);
 
         game.eventHandler = this;
         Gdx.input.setInputProcessor(new KeyboardUtil(this));
-
-        for (Character chr : teamA) {
-            chr.setSize(280, 350);
-        }
 
         commands = new Commands(this);
         generator.newMatch();
@@ -134,8 +134,8 @@ public class BattleScreen implements Screen, Move2PlayGame {
             for (Character chr : teamA) {
                 if (!chr.isDead()) {
                     Tween.to(chr, CharacterAccessor.POS_X, 3.0f).target(chr.getX() + 750).start(tweenManager);
-                    chr.setAnimation(AnimationCode.RUNNING);
-                    chr.getAnimations().flipFrames(false, false, true);
+                    chr.setAnimation(AnimationCode.RUNNING, true);
+                    chr.flip(false, false);
                     if (chr instanceof Player) {
                         Player player = (Player) chr;
                     }
@@ -150,7 +150,7 @@ public class BattleScreen implements Screen, Move2PlayGame {
                 for (Character chr : teamA) {
                     tweenManager.killTarget(chr);
                     chr.setPosition(chr.orgX, chr.orgY);
-                    chr.setAnimation(AnimationCode.IDLE);
+                    chr.setAnimation(AnimationCode.IDLE, true);
                     //chr.health = chr.getMaxHealth();
                     if (chr instanceof Player) {
                         Player player = (Player) chr;
@@ -204,12 +204,12 @@ public class BattleScreen implements Screen, Move2PlayGame {
                         long timeRemaining;
 
                         timeRemaining = 6000 - (TimeUtils.millis() - player.timeDied);
-                        player.getAnimations().setAlpha(0.5f + 0.5f * (((6000 - (float) timeRemaining)) / 6000));
+                        player.setAlpha(0.5f + 0.5f * (((6000 - (float) timeRemaining)) / 6000));
 
                         if (timeRemaining <= 0) {
                             player.setStatus(REVIVING);
                             friends.add(personagem);
-                            player.getAnimations().setAlpha(1.0f);
+                            player.setAlpha(1.0f);
                         }
                     }
                     break;
@@ -237,7 +237,7 @@ public class BattleScreen implements Screen, Move2PlayGame {
                     break;
 
                 case ACTING:
-                    if (personagem.getAnimations().isAnimationFinished()) {
+                    if (personagem.isAnimationFinished()) {
                         personagem.setStatus(RETURNING);
                         personagem.move(RETURNING, tweenManager, moveDirection);
                     }
@@ -251,14 +251,14 @@ public class BattleScreen implements Screen, Move2PlayGame {
                     break;
 
                 case DYING:
-                    if (personagem.getAnimations().isAnimationFinished()) {
+                    if (personagem.isAnimationFinished()) {
                         if (personagem instanceof Enemy) {
                             removeChrs.add(personagem);
                         } else {
 
                             if (personagem instanceof Player) {
                                 Player plyr = (Player) personagem;
-                                plyr.getAnimations().setAlpha(0.5f);
+                                plyr.setAlpha(0.5f);
                             }
                         }
 
@@ -267,8 +267,8 @@ public class BattleScreen implements Screen, Move2PlayGame {
                     break;
 
                 case REVIVING:
-                    if (personagem.getAnimations().isAnimationFinished()) {
-                        personagem.getAnimations().getAnimation().setPlayMode(Animation.PlayMode.NORMAL);
+                    if (personagem.isAnimationFinished()) {
+                        personagem.setPlayMode(Animation.PlayMode.NORMAL);
                         personagem.setStatus(RETURNING);
                         personagem.move(RETURNING, tweenManager, moveDirection);
                     }

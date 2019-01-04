@@ -4,16 +4,15 @@ import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.mygdx.game.SkeletonAnimation;
+import com.mygdx.game.Team;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import libgdxUtils.AnimatedSprite;
 import libgdxUtils.AnimationCode;
-import libgdxUtils.CharacterAccessor;
-import libgdxUtils.Commands;
-import libgdxUtils.MultiAnimatedSprite;
+import com.mygdx.game.accessors.CharacterAccessor;
+import com.mygdx.game.managers.SoundEffectManager;
 import libgdxUtils.StatusCode;
 import libgdxUtils.TextureUtil;
 import libgdxUtils.exceptions.CommandException;
@@ -22,81 +21,52 @@ import libgdxUtils.exceptions.CommandException;
  *
  * @author reysguep
  */
-public abstract class Character {
-
-    public Character(String name, CharacterPreset preset, int maxHealth, int strength) {
-        this(name, preset);
-        this.maxHealth = maxHealth;
-        this.strength = strength;
-    }
-
-    public Character(String name, CharacterPreset preset) {
-        this.maxHealth = preset.maxHealth;
-        this.health = this.maxHealth;
-        this.strength = preset.maxStr;
-        this.speed = preset.speed;
-        this.animations = TextureUtil.createAnimationsCharacter("Animations/" + preset.folder);
-        animations.setSize(preset.width, preset.height);
-        this.name = name;
-        status = 1;
-
-        this.hitSounds = preset.hitSounds;
-        this.deathSounds = preset.deathSounds;
-
-        this.actionCode = preset.actionCode;
-        this.deathCode = preset.deathCode;
-        this.targetAnimation = TextureUtil.visualEffects.get(preset.targetAnimation);
-        this.preset = preset;
-    }
-
-    public CharacterPreset preset;
+public abstract class Character extends SkeletonAnimation {
+    
     public int health;
     protected int maxHealth;
     protected int strength;
 
-    private final Array<Sound> hitSounds, deathSounds;
+    private final String actionSoundEffect, deathSoundEffect;
 
-    private int status;
-    private int speed;
-    public int orgX, orgY;
+    protected int status;
+    protected int speed;
+    protected int orgX, orgY;
 
-    public String name;
-    public char team;
+    private final String name;
 
-    public final String actionCode, deathCode;
-    public final Animation targetAnimation;
-
-    private final MultiAnimatedSprite animations;
+    private final Animation targetAnimation;
+    
+    private char team;
+    
+    public Character(String name, CharacterPreset preset, char team) {
+        super(Charact, "idle");
+        status = 1;
+        this.team = team;
+        
+        this.name = name;
+        this.maxHealth = preset.maxHealth;
+        this.strength = preset.strength;
+        this.speed = preset.speed;
+        this.actionSoundEffect = preset.actionSound;
+        this.deathSoundEffect = preset.deathSound;
+    }
 
     public boolean isDead() {
         return health <= 0;
     }
 
-    public void act(Commands commands) {
+    public void action() {
         setStatus(StatusCode.ACTING);
-        try {
-            commands.call(actionCode, this);
-        } catch (CommandException ex) {
-            Logger.getLogger(Character.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        act();
-        setAnimation(AnimationCode.ATTACKING);
-        hitSounds.random().play();
+        SoundEffectManager.playSoundEffect(actionSoundEffect);
     }
 
-    protected abstract void act();
-
-    public void beAttacked(int damage, Commands commands) {
+    public void beAttacked(int damage) {
         health -= damage;
         if (health <= 0) {
             setStatus(StatusCode.DYING);
-            try {
-                commands.call(deathCode, this);
-            } catch (CommandException ex) {
-                Logger.getLogger(Character.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
+
     }
 
     public abstract boolean canAttack();
@@ -113,67 +83,16 @@ public abstract class Character {
         return strength;
     }
 
-    public void draw(SpriteBatch batch) {
-        animations.draw(batch);
-
-    }
-
-    public void setPosition(float x, float y) {
-        animations.setPosition(x, y);
-    }
-
-    public void setSize(int width, int height) {
-        animations.setSize(width, height);
-    }
-
-    public void resizeLockHeight(int height) {
-        float reason = height / getHeight();
-        int width = (int) (getWidth() * reason);
-
-        setSize(width, height);
-    }
-
-    public void resizeLockWidth(int width) {
-        float reason = width / getWidth();
-        int height = (int) (getHeight() * reason);
-
-        setSize(width, height);
-    }
-
-    public void setAnimation(String animation) {
-        animations.startAnimation(animation);
-    }
-
     public String getName() {
         return name;
     }
 
-    public float getX() {
-        return animations.getX();
-    }
-
-    public float getY() {
-        return animations.getY();
-    }
-
-    public int getHeight() {
-        return (int) animations.getHeight();
-    }
-
-    public int getWidth() {
-        return (int) animations.getWidth();
-    }
-
-    public MultiAnimatedSprite getAnimations() {
-        return animations;
-    }
-    
     public int getSpeed() {
         return speed;
     }
 
     public boolean compareAnimation(String animation) {
-        return animations.getAnimation() == animations.getAnimation(animation);
+        return animation.equals(animation);
     }
 
     public int getStatus() {
@@ -185,31 +104,30 @@ public abstract class Character {
 
         switch (status) {
             case StatusCode.WAITING:
-                setAnimation(AnimationCode.IDLE);
+                setAnimation(AnimationCode.IDLE, true);
                 break;
 
             case StatusCode.GOING:
-                setAnimation(AnimationCode.RUNNING);
-                animations.flipFrames(false, false, true);
+                setAnimation(AnimationCode.RUNNING, true);
+                flip(false, false);
                 break;
 
             case StatusCode.ACTING:
                 break;
 
             case StatusCode.RETURNING:
-                setAnimation(AnimationCode.RUNNING);
-                animations.flipFrames(true, false, true);
+                setAnimation(AnimationCode.RUNNING, true);
+                flip(true, false);
                 break;
             case StatusCode.DYING:
                 health = 0;
-                animations.startAnimation(AnimationCode.DYING);
+                setAnimation(AnimationCode.DYING, false);
                 System.out.println(name + " morreu!");
-                deathSounds.random().play();
+                SoundEffectManager.playSoundEffect(deathSoundEffect);
                 break;
 
             case StatusCode.REVIVING:
-                animations.getAnimation(AnimationCode.DYING).setPlayMode(Animation.PlayMode.REVERSED);
-                setAnimation(AnimationCode.DYING);
+                setAnimation(AnimationCode.DYING, false); //!arrumar uma forma de inverter a animação 
                 health = maxHealth;
                 break;
 

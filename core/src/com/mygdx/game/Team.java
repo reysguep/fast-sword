@@ -56,7 +56,7 @@ public class Team extends Array<Character> {
                     break;
 
             }
-            character.getAnimations().flipAllAnimations(true, false);
+            character.flip(true, false);
         }
         character.setPosition(x, 100);
         character.orgX = x;

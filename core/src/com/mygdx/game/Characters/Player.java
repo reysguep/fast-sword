@@ -1,39 +1,34 @@
 package com.mygdx.game.Characters;
 
-import libgdxUtils.Commands;
-
 /**
  *
  * @author reysguep
  */
 
-public class Player extends Character implements Comparable<Player>{
+public abstract class Player extends Character implements Comparable<Player>{
 
-    public Player(br.cefetmg.move2play.model.Player player, PlayerPreset preset) {
-        super(player.getName(), preset);
+    public Player(br.cefetmg.move2play.model.Player player, PlayerPreset preset, char team) {
+        super(player.getName());
         pedaladasDadas = 0;
-        this.pedaladasMinimas = preset.pedaladasMinimas;
-        uuid = player.getUUID();
+        this.pedaladasMinimas = preset.steps;
+        this.playerModel = player;
         
     }
 
-    public Player(String name, PlayerPreset pst) {
-        super(name, pst);
-        pedaladasDadas = 0;
-        this.pedaladasMinimas = pst.pedaladasMinimas;
-        uuid = "1111";
+    public Player(String name) {
+        super(name);
+        playerModel = new br.cefetmg.move2play.model.Player();
+        playerModel.setUUID("1111");
     }
 
     public int pedaladasDadas, pedaladasMinimas;
-    
     public long timeDied;
 
-    private final String uuid;
-    
+    private br.cefetmg.move2play.model.Player playerModel;
     public int score;
 
     @Override
-    public void act() {
+    public void action() {
         pedaladasDadas -= pedaladasMinimas;
     }
     
@@ -58,8 +53,8 @@ public class Player extends Character implements Comparable<Player>{
         return pedaladasDadas >= pedaladasMinimas;
     }
 
-    public String getUuid() {
-        return uuid;
+    public br.cefetmg.move2play.model.Player getPlayerModel() {
+        return playerModel;
     }
 
     @Override

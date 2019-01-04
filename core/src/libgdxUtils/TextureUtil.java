@@ -21,40 +21,6 @@ import java.util.logging.Logger;
  */
 public class TextureUtil {
 
-    public static HashMap<String, Animation> visualEffects = getVisualEffects();
-
-//Creates all character animations
-    public static MultiAnimatedSprite createAnimationsCharacter(String folder) {
-
-        MultiAnimatedSprite multiAnimations;
-        Animation<TextureRegion> idle;
-        Animation<TextureRegion> attacking;
-        Animation<TextureRegion> dying;
-        Animation<TextureRegion> running;
-        Texture textura;
-        Map<String, Animation> animations = new HashMap<String, Animation>();
-
-        String nomeDaAnimacao;
-
-        String dados[][] = splitFile(folder + "/data.txt", "/");
-
-        idle = getRespectiveAnimation(AnimationCode.IDLE, dados, folder);
-        running = getRespectiveAnimation(AnimationCode.IDLE, dados, folder);
-        attacking = getRespectiveAnimation(AnimationCode.ATTACKING, dados, folder);
-        dying = getRespectiveAnimation(AnimationCode.DYING, dados, folder);
-
-        animations.put(AnimationCode.IDLE, idle);
-        animations.put(AnimationCode.ATTACKING, attacking);
-        animations.put(AnimationCode.DYING, dying);
-        animations.put(AnimationCode.RUNNING, running);
-
-        idle.setPlayMode(Animation.PlayMode.LOOP);
-        running.setPlayMode(Animation.PlayMode.LOOP);
-        multiAnimations = new MultiAnimatedSprite(animations, AnimationCode.IDLE);
-
-        return multiAnimations;
-    }
-
     public static String[][] splitFile(String folder, String spliter) {
 
         FileReader fr;

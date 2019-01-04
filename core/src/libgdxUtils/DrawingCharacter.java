@@ -4,12 +4,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.esotericsoftware.spine.SkeletonMeshRenderer;
 import com.mygdx.game.Characters.Character;
 import com.mygdx.game.Characters.Player;
 import static libgdxUtils.StatusCode.*;
@@ -20,7 +22,8 @@ import static libgdxUtils.StatusCode.*;
  */
 public class DrawingCharacter {
 
-    private final SpriteBatch batch;
+    private final PolygonSpriteBatch batch;
+    private final SkeletonMeshRenderer renderer;
 
     FreeTypeFontGenerator generatorName;
     FreeTypeFontParameter parameterName;
@@ -32,8 +35,9 @@ public class DrawingCharacter {
 
     GlyphLayout layout = new GlyphLayout();
 
-    public DrawingCharacter(SpriteBatch batch) {
+    public DrawingCharacter(PolygonSpriteBatch batch, SkeletonMeshRenderer renderer) {
         this.batch = batch;
+        this.renderer = renderer;
 
         generatorName = new FreeTypeFontGenerator(Gdx.files.internal("fonts/VeniceClassic.ttf"));
         parameterName = new FreeTypeFontParameter();
@@ -50,7 +54,7 @@ public class DrawingCharacter {
     }
 
     public void draw(Character character) {
-        character.getAnimations().draw(batch);
+        character.draw(renderer, batch);
         drawName(character);
         if (character.getStatus() != DEAD) {
             drawBars(character);
@@ -63,10 +67,10 @@ public class DrawingCharacter {
     }
 
     private void drawBars(Character character) {
-        int x, y, width;
+        float x, y, width;
 
-        x = (int) character.getX() + (character.getWidth() / 2) - 50;
-        y = (int) character.getY() + character.getHeight();
+        x = character.getX() + (character.getWidth() / 2) - 50;
+        y = character.getY() + character.getHeight();
 
         width = (int) (100.0f * character.getProgress());
 
@@ -80,7 +84,7 @@ public class DrawingCharacter {
     }
 
     private void drawName(Character character) {
-        int x, y;
+        float x, y;
         float textWidth;
 
         CharSequence text = character.getName();
@@ -88,17 +92,17 @@ public class DrawingCharacter {
         layout.setText(fontName, text);
         textWidth = layout.width;
 
-        x = (int) character.getX() + (character.getWidth() / 2) - (int) (textWidth / 2);
-        y = (int) character.getY() + character.getHeight() + 45;
+        x = character.getX() + (character.getWidth() / 2) - (textWidth / 2);
+        y = character.skeleton.findBone("head").getY() + 45;
 
-        fontName.draw(batch, text, x, y);
+        fontName.draw(batch, text, 0.1f, y);
     }
 
     private void drawReviveBar(Player player) {
-        int x, y;
+        float x, y;
         
-        x = (int) player.getX() + (player.getWidth() / 2) - 50;
-        y = (int) player.getY() + player.getHeight();
+        x = player.getX() + (player.getWidth() / 2) - 50;
+        y = player.getY() + player.getHeight();
         
         long timeSince = TimeUtils.millis() - player.timeDied;
         long timeRemaining = 6000 - timeSince;

@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
@@ -21,7 +22,7 @@ public class HitAnimation {
         this.thisArray = thisArray;
         this.animation.setSize(200, 200);
         startTime = TimeUtils.millis();
-        this.target.getAnimations().setColor(Color.BLUE);
+        this.target.setColor(Color.BLUE);
     }
 
     private final Character target;
@@ -29,7 +30,7 @@ public class HitAnimation {
     private final Array<HitAnimation> thisArray;
     private final long startTime;
 
-    public void draw(SpriteBatch batch) {
+    public void draw(PolygonSpriteBatch batch) {
         if (!animation.isAnimationFinished()) {
             int x, y;
             x = (int) (target.getX() + (target.getWidth() / 2) - (animation.getWidth() / 2));
@@ -41,9 +42,9 @@ public class HitAnimation {
         }
 
         if (TimeUtils.timeSinceMillis(startTime) >= 300) {
-            target.getAnimations().setColor(Color.WHITE);
+            target.setColor(Color.WHITE);
         } else {
-            target.getAnimations().setColor(1f, 0.3f, 0.3f, 1f);
+            target.setColor(new Color(1f, 0.3f, 0.3f, 1f));
         }
     }
 }

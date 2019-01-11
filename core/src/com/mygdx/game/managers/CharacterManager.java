@@ -1,8 +1,14 @@
 package com.mygdx.game.managers;
 
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.CharacterCreator;
 import com.mygdx.game.Characters.Enemy;
 import com.mygdx.game.Characters.Player;
+import com.mygdx.game.Screens.BattleScreen;
+import com.mygdx.game.exceptions.EmptyCharacterClassesException;
+import com.mygdx.game.loaders.CharacterLoader;
+import java.lang.reflect.Constructor;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -12,52 +18,100 @@ import java.util.logging.Logger;
  */
 public class CharacterManager {
 
-    private static final String[] PLAYERS = new String[]{
-        "Viking",
-        "Archer"
-    };
+    private final Array<Constructor<?>> playerClasses, enemyClasses;
+    private int playerIndex, enemyIndex;
+    private final int roundsToIntroduceEnemy;
+    private int newEnemyIn;
+    private final BattleScreen screen;
 
-    private static final String[] ENEMIES = new String[]{
-        "Skeleton",
-        "Slime"
-    };
+    public CharacterManager(BattleScreen screen, int newEnemy) {
+        this.screen = screen;
+        this.roundsToIntroduceEnemy = newEnemy;
+        this.newEnemyIn = newEnemy;
+        this.playerIndex = 0;
+        this.enemyIndex = 0;
 
-    private static final String PLAYERS_PACKAGE_PATH
-            = "com.mygdx.game.Characters.players";
+        this.playerClasses = CharacterLoader.getPlayerConstructors();
+        this.enemyClasses = CharacterLoader.getEnemyConstructors();
 
-    private static final String ENEMIES_PACKAGE_PATH
-            = "com.mygdx.game.Characters.enemies";
+        this.enemyClasses.shuffle();
+    }
 
-    private Array<Class<Player>> playerClasses;
-    private Array<Class<Enemy>> enemyClasses;
+    public Player newPlayer(br.cefetmg.move2play.model.Player playerModel) {
+        Player player;
 
-    public CharacterManager() {
-        playerClasses = new Array<>();
-        enemyClasses = new Array<>();
-
-        for (String playerClassName : PLAYERS) {
-            String completeClassName = PLAYERS_PACKAGE_PATH
-                    + "." + playerClassName;
-
+        if (playerClasses.isEmpty()) {
             try {
-                Class playerClass = Class.forName(completeClassName);
-                playerClasses.add(playerClass);
-                Constructor c = playerClass.getConstructor(types)
-            } catch (ClassNotFoundException ex) {
+                throw new EmptyCharacterClassesException("Player");
+            } catch (EmptyCharacterClassesException ex) {
                 Logger.getLogger(CharacterManager.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
-        for (String enemyClassName : ENEMIES) {
-            String completeClassName = ENEMIES_PACKAGE_PATH
-                    + "." + enemyClassName;
 
+        if (playerIndex == playerClasses.size) {
+            playerIndex = 0;
+        }
+
+        player = CharacterCreator.createPlayer(playerModel,
+                playerClasses.get(playerIndex), screen);
+        playerIndex++;
+
+        return player;
+    }
+
+    public void newRound() {
+        int aTeamMembers, bTeamMembers;
+        int enemies;
+        Random random;
+        Enemy enemy;
+
+        aTeamMembers = screen.teamA.size;
+        bTeamMembers = screen.teamB.size;
+        random = new Random();
+
+        if (newEnemyIn <= 0) {
+            if (enemyIndex < bTeamMembers) {
+                enemyIndex++;
+                newEnemyIn = roundsToIntroduceEnemy;
+
+                enemy = newEnemy(enemyIndex);
+                screen.teamB.add(enemy);
+            }
+        } else {
+            enemies = random.nextInt(bTeamMembers) + 1;
+            for (int i = 0; i < enemies; i++) {
+                enemy = newEnemy();
+
+                screen.teamB.add(enemy);
+            }
+        }
+        newEnemyIn--;
+    }
+
+    public Enemy newEnemy() {
+        Enemy enemy;
+        Random random;
+        int classNumber;
+
+        random = new Random();
+        classNumber = random.nextInt(enemyIndex);
+
+        enemy = newEnemy(classNumber);
+        return enemy;
+    }
+
+    public Enemy newEnemy(int classNumber) {
+        Enemy enemy;
+
+        if (enemyClasses.isEmpty()) {
             try {
-                Class enemyClass = Class.forName(completeClassName);
-                enemyClasses.add(enemyClass);
-            } catch (ClassNotFoundException ex) {
+                throw new EmptyCharacterClassesException("Enemy");
+            } catch (EmptyCharacterClassesException ex) {
                 Logger.getLogger(CharacterManager.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+
+        enemy = CharacterCreator.createEnemy(playerClasses.get(classNumber));
+        return enemy;
     }
 }

@@ -1,4 +1,4 @@
-package com.mygdx.game.Characters.players;
+package com.mygdx.game.Characters.enemies;
 
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Characters.presets.PlayerPreset;
@@ -6,20 +6,22 @@ import com.mygdx.game.Characters.Player;
 import com.mygdx.game.Characters.actions.TargetSelection;
 import com.mygdx.game.Screens.BattleScreen;
 import com.mygdx.game.Characters.Character;
+import com.mygdx.game.Characters.Enemy;
 import com.mygdx.game.Characters.actions.CharacterActions;
+import com.mygdx.game.Characters.presets.EnemyPreset;
 
 /**
  *
  * @author reysguep
  */
-public class Viking extends Player{
+public class BadViking extends Enemy{
     
-    public Viking(br.cefetmg.move2play.model.Player playerModel, BattleScreen screen) {
-        super(playerModel , createPreset(), screen);
+    public BadViking(BattleScreen screen) {
+        super(createPreset(), screen);
     }
     
-    private static PlayerPreset createPreset() {
-        PlayerPreset preset = new PlayerPreset();
+    private static EnemyPreset createPreset() {
+        EnemyPreset preset = new EnemyPreset();
         
         preset.actionSound = "hit1";
         preset.deathSound = "death1";
@@ -29,7 +31,7 @@ public class Viking extends Player{
         preset.strength = 70;
         preset.scale = 1.0f;
         preset.speed = 75;
-        preset.steps = 10;
+        preset.timeToAttack = 8;
         
         return preset;
     }

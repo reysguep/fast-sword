@@ -1,75 +1,153 @@
 package com.mygdx.game.Characters;
 
+import com.mygdx.game.Characters.presets.CharacterPreset;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenManager;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.mygdx.game.Screens.BattleScreen;
 import com.mygdx.game.SkeletonAnimation;
 import com.mygdx.game.Team;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import libgdxUtils.AnimationCode;
 import com.mygdx.game.accessors.CharacterAccessor;
-import com.mygdx.game.managers.SoundEffectManager;
-import libgdxUtils.StatusCode;
-import libgdxUtils.TextureUtil;
-import libgdxUtils.exceptions.CommandException;
+import com.mygdx.game.exceptions.StateNotFoundException;
+import com.mygdx.game.loaders.SpineLoader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import libgdxUtils.StateCode;
 
 /**
  *
  * @author reysguep
  */
 public abstract class Character extends SkeletonAnimation {
-    
+
     public int health;
     protected int maxHealth;
     protected int strength;
 
     private final String actionSoundEffect, deathSoundEffect;
 
-    protected int status;
+    protected int state;
     protected int speed;
     protected int orgX, orgY;
 
     private final String name;
 
-    private final Animation targetAnimation;
-    
+    private final String targetAnimation;
+
     private char team;
-    
-    public Character(String name, CharacterPreset preset, char team) {
-        super(Charact, "idle");
-        status = 1;
-        this.team = team;
-        
+    protected final BattleScreen screen;
+
+    public Character(String name, CharacterPreset preset, BattleScreen screen) {
+        super(SpineLoader.getClassSkeleton(preset.folder), "idle");
+        state = 1;
         this.name = name;
         this.maxHealth = preset.maxHealth;
         this.strength = preset.strength;
         this.speed = preset.speed;
         this.actionSoundEffect = preset.actionSound;
         this.deathSoundEffect = preset.deathSound;
+        this.targetAnimation = preset.hitAnimation;
+
+        this.screen = screen;
     }
 
     public boolean isDead() {
         return health <= 0;
     }
 
-    public void action() {
-        setStatus(StatusCode.ACTING);
-        SoundEffectManager.playSoundEffect(actionSoundEffect);
-    }
+    public abstract void action();
 
     public void beAttacked(int damage) {
         health -= damage;
         if (health <= 0) {
-            setStatus(StatusCode.DYING);
+            setState(StateCode.DYING);
         }
 
     }
 
+    public void setState(int state) {
+        boolean defaultSide;
+        TweenManager tween;
+
+        tween = screen.tweenManager;
+        defaultSide = (team != 'a'); //TURNS TO RIGHT OR LEFT BY DEFAULT
+
+        screen.tweenManager.killTarget(this);
+
+        switch (state) {
+            case StateCode.WAITING:
+                flipX(defaultSide);
+                setAnimation(AnimationCode.IDLE, true);
+                break;
+
+            case StateCode.GOING:
+                flipX(defaultSide);
+                setAnimation(AnimationCode.RUNNING, true);
+                move(tween);
+                break;
+
+            case StateCode.RETURNING:
+                flipX(!defaultSide);
+                setAnimation(AnimationCode.RUNNING, true);
+                move(tween);
+                break;
+
+            case StateCode.ACTING:
+                flipX(defaultSide);
+                setAnimation(AnimationCode.ATTACKING, false);
+                break;
+
+            case StateCode.DYING:
+                setAnimation(AnimationCode.DYING, false);
+                health = 0;
+
+                if (this instanceof Player) {
+                    Player thisPlayer = (Player) this;
+                    thisPlayer.takenSteps = 0;
+                    thisPlayer.score /= 2;
+                    thisPlayer.timeDied = TimeUtils.millis();
+                }
+                break;
+
+            case StateCode.REVIVING:
+                setAnimation(AnimationCode.DYING, true);
+                reverseAnimation(true);
+                break;
+
+            case StateCode.DEAD:
+                screen.soundEffectManager.playSoundEffect(getActionSoundEffect());
+                break;
+
+            default: {
+            try {
+                throw new StateNotFoundException(String.valueOf(state));
+            } catch (StateNotFoundException ex) {
+                Logger.getLogger(Character.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            }
+        } //end switch
+
+        this.state = state;
+    } //end method
+
     public abstract boolean canAttack();
+
+    public boolean canAttack(boolean factor1) {
+        boolean canAttack, factor2;
+        Team enemies;
+
+        if (team == 'a') {
+            enemies = screen.teamB;
+        } else {
+            enemies = screen.teamA;
+        }
+
+        factor2 = !enemies.getLiveMembers().isEmpty();
+
+        canAttack = factor1 & factor2;
+        return canAttack;
+    }
 
     public int getHealth() {
         return health;
@@ -95,65 +173,28 @@ public abstract class Character extends SkeletonAnimation {
         return animation.equals(animation);
     }
 
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-
-        switch (status) {
-            case StatusCode.WAITING:
-                setAnimation(AnimationCode.IDLE, true);
-                break;
-
-            case StatusCode.GOING:
-                setAnimation(AnimationCode.RUNNING, true);
-                flip(false, false);
-                break;
-
-            case StatusCode.ACTING:
-                break;
-
-            case StatusCode.RETURNING:
-                setAnimation(AnimationCode.RUNNING, true);
-                flip(true, false);
-                break;
-            case StatusCode.DYING:
-                health = 0;
-                setAnimation(AnimationCode.DYING, false);
-                System.out.println(name + " morreu!");
-                SoundEffectManager.playSoundEffect(deathSoundEffect);
-                break;
-
-            case StatusCode.REVIVING:
-                setAnimation(AnimationCode.DYING, false); //!arrumar uma forma de inverter a animação 
-                health = maxHealth;
-                break;
-
-            case StatusCode.DEAD:
-                if (this instanceof Player) {
-                    Player thisPlayer = (Player) this;
-                    thisPlayer.pedaladasDadas = 0;
-                    thisPlayer.score /= 2;
-                    thisPlayer.timeDied = TimeUtils.millis();
-                }
-                break;
-        }
+    public int getState() {
+        return state;
     }
 
     public abstract float getProgress();
 
-    public void move(int settedStatus, TweenManager tween, int moveDirection) {
-        int destiny, distance;
+    public void move(TweenManager tween) {
+        int destiny, distance, moveDirection;
         float time;
 
-        switch (settedStatus) {
-            case StatusCode.RETURNING:
+        if (team == 'a') {
+            moveDirection = 1;
+        } else {
+            moveDirection = -1;
+        }
+
+        switch (state) {
+            case StateCode.RETURNING:
                 destiny = orgX;
                 break;
 
-            case StatusCode.GOING:
+            case StateCode.GOING:
                 destiny = orgX + 100 * moveDirection;
                 break;
 
@@ -164,5 +205,41 @@ public abstract class Character extends SkeletonAnimation {
         distance = Math.abs((int) this.getX() - destiny);
         time = distance / speed;
         Tween.to(this, CharacterAccessor.POS_X, time).target(destiny).delay(0).start(tween);
+    }
+
+    public String getActionSoundEffect() {
+        return actionSoundEffect;
+    }
+
+    public String getDeathSoundEffect() {
+        return deathSoundEffect;
+    }
+
+    public int getOrgX() {
+        return orgX;
+    }
+
+    public int getOrgY() {
+        return orgY;
+    }
+
+    public String getTargetAnimation() {
+        return targetAnimation;
+    }
+
+    public char getTeam() {
+        return team;
+    }
+
+    public void setOrgX(int orgX) {
+        this.orgX = orgX;
+    }
+
+    public void setOrgY(int orgY) {
+        this.orgY = orgY;
+    }
+
+    public void setTeam(char team) {
+        this.team = team;
     }
 }

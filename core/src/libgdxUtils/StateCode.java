@@ -4,7 +4,7 @@ package libgdxUtils;
  *
  * @author reysguep
  */
-public class StatusCode {
+public class StateCode {
     public static final int DEAD = 0;
     public static final int WAITING = 1;
     public static final int GOING = 2;

@@ -35,14 +35,13 @@ public class SoundEffectLoader {
     }
     
     private static File[] findSoundEffectFolders() {
-        File soundFolder = new File(DEFAULT_PATH);
+        File soundFolder = Gdx.files.internal(DEFAULT_PATH).file();
         File[] soundEffectFolders = soundFolder.listFiles(new DirectoryFilter());
         
         return soundEffectFolders;
     }
     
     private static Array<Sound> getSoundsFromFolder(File directory) {
-        int directorySize;
         Array<Sound> sounds;
         File[] effectsFiles;
         

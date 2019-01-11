@@ -5,16 +5,14 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.esotericsoftware.spine.SkeletonMeshRenderer;
 import com.mygdx.game.Characters.Character;
 import com.mygdx.game.Characters.Player;
-import static libgdxUtils.StatusCode.*;
+import static libgdxUtils.StateCode.*;
 
 /**
  *
@@ -56,7 +54,7 @@ public class DrawingCharacter {
     public void draw(Character character) {
         character.draw(renderer, batch);
         drawName(character);
-        if (character.getStatus() != DEAD) {
+        if (character.getState() != DEAD) {
             drawBars(character);
         } else {
             if (character instanceof Player) {

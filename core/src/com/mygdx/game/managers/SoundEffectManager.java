@@ -14,22 +14,19 @@ import java.util.logging.Logger;
  */
 public class SoundEffectManager {
 
-    private static final Array<SoundEffect> SOUND_EFFECTS = SoundEffectLoader.loadSoundEffects();
-    private static HashMap<String, Integer> counter;
+    private final Array<SoundEffect> soundEffetcs;
+    private final HashMap<String, Integer> counter;
 
-    private static HashMap<String, Integer> resetCount() {
-        HashMap<String, Integer> newCounter;
-
-        newCounter = new HashMap<>();
-
-        for (SoundEffect soundEffect : SOUND_EFFECTS) {
-            newCounter.put(soundEffect.getEffectName(), 0);
+    public SoundEffectManager() {
+        soundEffetcs = SoundEffectLoader.loadSoundEffects();
+        counter = new HashMap<>();
+        
+        for (SoundEffect soundEffect : soundEffetcs) {
+            counter.put(soundEffect.getEffectName(), 0);
         }
-
-        return newCounter;
     }
 
-    public static void playSoundEffect(String effectName) {
+    public void playSoundEffect(String effectName) {
         SoundEffect soundEffect;
         int effectSize, effectIndex;
 
@@ -51,12 +48,12 @@ public class SoundEffectManager {
         }
     }
 
-    private static SoundEffect getSoundEffectByName(String effectName) throws SoundEffectNotFoundException {
+    private SoundEffect getSoundEffectByName(String effectName) throws SoundEffectNotFoundException {
         SoundEffect soundEffect = null;
 
-        for (int i = 0; i < SOUND_EFFECTS.size; i++) {
-            if (SOUND_EFFECTS.get(i).getEffectName().equals(effectName)) {
-                soundEffect = SOUND_EFFECTS.get(i);
+        for (int i = 0; i < soundEffetcs.size; i++) {
+            if (soundEffetcs.get(i).getEffectName().equals(effectName)) {
+                soundEffect = soundEffetcs.get(i);
                 break;
             }
         }

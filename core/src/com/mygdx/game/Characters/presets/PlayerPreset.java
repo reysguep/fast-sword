@@ -1,4 +1,6 @@
-package com.mygdx.game.Characters;
+package com.mygdx.game.Characters.presets;
+
+import com.mygdx.game.Characters.presets.CharacterPreset;
 
 /**
  *

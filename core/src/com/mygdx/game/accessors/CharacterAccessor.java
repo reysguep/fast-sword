@@ -29,7 +29,7 @@ public class CharacterAccessor implements TweenAccessor<Character>{
             float[] newValues) {
         switch (tweenType) {
             case POS_X:
-                target.setPosition(newValues[0], target.orgY);
+                target.setPosition(newValues[0], target.getOrgY());
                 break;
                 
             default:

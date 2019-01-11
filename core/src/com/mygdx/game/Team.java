@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Characters.Character;
+import static libgdxUtils.StateCode.*;
 
 /**
  *
@@ -15,14 +16,15 @@ public class Team extends Array<Character> {
 
     private final char team;
 
-    public void addMember(Character character) {
+    @Override
+    public void add(Character character) {
         int nMembers;
         int x = 0;
 
+        character.setTeam(team);
+        
         super.add(character);
         nMembers = this.size;
-        
-        character.team = team;
 
         if (team == 'a') {
             switch (nMembers) {
@@ -52,14 +54,31 @@ public class Team extends Array<Character> {
                     x = 160 * 4;
                     break;
                 case 4:
-                    x = (int)(4.5 * 160);
+                    x = (int) (4.5 * 160);
                     break;
 
             }
             character.flip(true, false);
         }
         character.setPosition(x, 100);
-        character.orgX = x;
-        character.orgY = 100;
+        character.setOrgX(x);
+        character.setOrgY(100);
+    }
+    
+    public Array<Character> getLiveMembers() {
+        Array<Character> liveMembers;
+        
+        liveMembers = new Array<>();
+        for(Character member : this) {
+            switch(member.getState()) {
+                case DEAD:
+                case DYING:
+                    break;
+                default:
+                    liveMembers.add(member);
+            }
+        }
+        
+        return liveMembers;
     }
 }

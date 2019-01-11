@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -21,16 +22,16 @@ import java.util.logging.Logger;
  */
 public class TextureUtil {
 
-    public static String[][] splitFile(String folder, String spliter) {
+    public static String[][] splitFile(File file, String spliter) {
 
         FileReader fr;
         BufferedReader br;
-        ArrayList<String[]> array = new ArrayList<String[]>();
+        ArrayList<String[]> array = new ArrayList<>();
 
         String[] temp;
         String line;
         try {
-            fr = new FileReader(folder);
+            fr = new FileReader(file);
             br = new BufferedReader(fr);
 
             line = br.readLine();
@@ -71,77 +72,5 @@ public class TextureUtil {
         animacao = new Animation<TextureRegion>(time, animationFrames);
 
         return animacao;
-    }
-
-    private static Animation getRespectiveAnimation(String nomeDaAnimacao, String[][] dados, String folder) {
-        String[] dadosDaAnimacao = null;
-        int tamanho = dados.length;
-        int numeroDeFrames;
-        float tempoEntreFrames;
-        Texture textura;
-        Animation animacao;
-
-        for (int i = 0; i < tamanho; i++) {
-            if (nomeDaAnimacao.equals(dados[i][2])) {
-                dadosDaAnimacao = dados[i];
-                break;
-            }
-        }
-
-        if (dadosDaAnimacao == null) {
-            System.err.println("Animação não encontrada!");
-            Runtime.getRuntime().exit(-1);
-            return null;
-        }
-
-        numeroDeFrames = Integer.parseInt(dadosDaAnimacao[0]);
-        tempoEntreFrames = Float.parseFloat(dadosDaAnimacao[1]);
-        textura = new Texture(Gdx.files.internal(folder + "/" + nomeDaAnimacao + ".png"));
-
-        animacao = spriteSheetToAnimation(textura, numeroDeFrames, tempoEntreFrames);
-
-        return animacao;
-    }
-
-    public static HashMap<String, Animation> getVisualEffects() {
-        String[][] dados = splitFile("Animations/visual effects/info.txt", ";");
-        HashMap<String, Animation> visualEffct = new HashMap<String, Animation>();
-
-        for (int i = 0; i < dados.length; i++) {
-            Texture texture = new Texture(Gdx.files.internal("Animations/visual effects/" + dados[i][0]) + ".png");
-            int frames = Integer.parseInt(dados[i][1]);
-            float timeBtwFrames = Float.parseFloat(dados[i][2]);
-            Animation animation = spriteSheetToAnimation(texture, frames, timeBtwFrames);
-            visualEffct.put(dados[i][0], animation);
-        }
-
-        return visualEffct;
-    }
-
-    private static Animation<TextureRegion> sheetToAnimation(Texture texture, int rows, int columns,
-            float frameDuration, int totalFrames) {
-        Animation<TextureRegion> animation;
-        TextureRegion[][] tmp;
-        TextureRegion[] sheetRegion;
-
-        tmp = TextureRegion.split(texture, texture.getWidth() / columns,
-                texture.getHeight() / rows);
-
-        sheetRegion = new TextureRegion[totalFrames];
-
-        int index = 0;
-        for (TextureRegion[] row : tmp) {
-            for (TextureRegion column : row) {
-                sheetRegion[index] = column;
-                index++;
-                if (index >= totalFrames) {
-                    break;
-                }
-            }
-        }
-
-        animation = new Animation<TextureRegion>(frameDuration, sheetRegion);
-
-        return animation;
     }
 }

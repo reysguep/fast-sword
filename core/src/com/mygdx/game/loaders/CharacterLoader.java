@@ -1,68 +1,115 @@
 package com.mygdx.game.loaders;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
-import com.esotericsoftware.spine.SkeletonData;
-import com.esotericsoftware.spine.SkeletonJson;
-import java.io.File;
-import java.util.HashMap;
+import java.lang.reflect.Constructor;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author reysguep
  */
 public class CharacterLoader {
-    private static final String CHARACTERS_FOLDER = "Animations/spine/";
-    private static final HashMap<String, SkeletonData> SKELETON_MAP = loadCharacters();
-     
-    public static SkeletonData getClassSkeleton(String className) {
-        return SKELETON_MAP.get(className);
+
+    private static final String[] PLAYERS = new String[]{
+        "Viking",
+        "Archer"
+    };
+
+    private static final String[] ENEMIES = new String[]{
+        "Skeleton",
+        "Slime"
+    };
+
+    private static final String PLAYERS_PACKAGE_PATH
+            = "com.mygdx.game.Characters.players";
+
+    private static final String ENEMIES_PACKAGE_PATH
+            = "com.mygdx.game.Characters.enemies";
+
+    public static Array<Constructor<?>> getEnemyConstructors() {
+        Array<Constructor<?>> enemyConstructors;
+        Array<Class<?>> enemyClasses;
+        Class<?>[] types;
+
+        types = new Class<?>[1];
+        types[0] = com.mygdx.game.Screens.BattleScreen.class;
+        enemyClasses = createCharacterClasses(ENEMIES_PACKAGE_PATH, ENEMIES);
+        enemyConstructors = createCharacterConstructors(enemyClasses, types);
+
+        return enemyConstructors;
     }
     
-    private static HashMap<String, SkeletonData> loadCharacters() {
-        HashMap<String, SkeletonData> newMap;
-        Array<File> charactersFolders;
-        
-        newMap = new HashMap<>();
-        charactersFolders = findCharactersFolders();
-        
-        for(File folder : charactersFolders) {
-            SkeletonData data;
-            String className;
-            
-            data = createSkeletonData(folder);
-            className = folder.getName();
-            
-            newMap.put(className, data);
+    public static Array<Constructor<?>> getPlayerConstructors() {
+        Array<Constructor<?>> playerConstructors;
+        Array<Class<?>> playerClasses;
+        Class<?>[] types;
+
+        types = new Class<?>[2];
+        types[0] = br.cefetmg.move2play.model.Player.class;
+        types[1] = com.mygdx.game.Screens.BattleScreen.class;
+        playerClasses = createCharacterClasses(PLAYERS_PACKAGE_PATH, PLAYERS);
+        playerConstructors = createCharacterConstructors(playerClasses, types);
+
+        return playerConstructors;
+    }
+
+    private static Array<Constructor<?>> createCharacterConstructors(
+            Array<Class<?>> characterClasses, Class<?>[] types) {
+
+        Array<Constructor<?>> characterConstructors;
+
+        characterConstructors = new Array<>();
+        for (Class<?> characterClass : characterClasses) {
+            Constructor<?> characterConstructor;
+
+            characterConstructor = createCharacterConstructor(characterClass, types);
+            characterConstructors.add(characterConstructor);
         }
-        
-        return newMap;
+
+        return characterConstructors;
     }
+
+    private static Constructor<?> createCharacterConstructor(Class<?> characterClass, Class<?>[] types) {
+        Constructor<?> characterConstructor = null;
+
+        try {
+            characterConstructor = characterClass.getConstructor(types);
+        } catch (NoSuchMethodException | SecurityException ex) {
+            Logger.getLogger(CharacterLoader.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return characterConstructor;
+    }
+
+    private static Array<Class<?>> createCharacterClasses(String classPath, String[] classesNames) {
+        Array<Class<?>> characterClasses;
+
+        characterClasses = new Array<>();
+
+        for (String className : classesNames) {
+            Class<?> characterClass;
+            String classCompleteName;
+
+            classCompleteName = classPath + className;
+            characterClass = createCharacterClass(classCompleteName);
+            characterClasses.add(characterClass);
+        }
+
+        return characterClasses;
+    }
+
+    private static Class<?> createCharacterClass(String classCompletePath) {
+        Class<?> characterClass = null;
+
+        try {
+            characterClass = Class.forName(classCompletePath);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(CharacterLoader.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return characterClass;
+    }
+
     
-    private static Array<File> findCharactersFolders() {
-        Array<File> charactersFolders;
-        File assetsFolder;
-        
-        charactersFolders = new Array<>();
-        assetsFolder = new File(CHARACTERS_FOLDER);
-        charactersFolders.addAll(assetsFolder.listFiles());
-        return charactersFolders;
-    }
-    
-    private static SkeletonData createSkeletonData(File folder) {
-        SkeletonData data;
-        TextureAtlas atlas;
-        SkeletonJson json;
-        String directoryPath;
-        
-        directoryPath = CHARACTERS_FOLDER + folder.getName() + "/";
-        atlas = new TextureAtlas(
-                Gdx.files.internal(directoryPath + "map.atlas"));
-        json = new SkeletonJson(atlas);
-        data = json.readSkeletonData(
-                Gdx.files.internal(directoryPath + "data.json"));
-        
-        return data;
-    }
 }

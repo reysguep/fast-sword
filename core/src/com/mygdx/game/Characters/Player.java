@@ -1,56 +1,56 @@
 package com.mygdx.game.Characters;
 
+import com.mygdx.game.Characters.presets.PlayerPreset;
+import com.mygdx.game.Screens.BattleScreen;
+
 /**
  *
  * @author reysguep
  */
+public abstract class Player extends Character implements Comparable<Player> {
 
-public abstract class Player extends Character implements Comparable<Player>{
-
-    public Player(br.cefetmg.move2play.model.Player player, PlayerPreset preset, char team) {
-        super(player.getName());
-        pedaladasDadas = 0;
-        this.pedaladasMinimas = preset.steps;
-        this.playerModel = player;
-        
-    }
-
-    public Player(String name) {
-        super(name);
-        playerModel = new br.cefetmg.move2play.model.Player();
-        playerModel.setUUID("1111");
-    }
-
-    public int pedaladasDadas, pedaladasMinimas;
+    public int takenSteps, minimumSteps;
     public long timeDied;
 
-    private br.cefetmg.move2play.model.Player playerModel;
+    private final br.cefetmg.move2play.model.Player playerModel;
     public int score;
+
+    public Player(br.cefetmg.move2play.model.Player player,
+            PlayerPreset preset, BattleScreen screen) {
+        super(player.getName(), preset, screen);
+        takenSteps = 0;
+        this.minimumSteps = preset.steps;
+        this.playerModel = player;
+
+    }
+    
+    public static br.cefetmg.move2play.model.Player createPlayerModel(String name,
+            String uuid) {
+        br.cefetmg.move2play.model.Player playerModel;
+        playerModel = new br.cefetmg.move2play.model.Player();
+        
+        playerModel.setUUID(uuid);
+        playerModel.setName(name);
+        //playerModel.setColor(color);
+        
+        return playerModel;
+    }
 
     @Override
     public void action() {
-        pedaladasDadas -= pedaladasMinimas;
-    }
-    
-    public void upgradeStrength() {
-        strength *= (120 / 100);
+        takenSteps -= minimumSteps;
     }
 
-    public void upgradeHealth() {
-        health *= (120 / 100);
-    }
-
-    public void upgradeSpeed() {
-        pedaladasMinimas *= (80 / 100);
-    }
-
-    public void contarPedalada(float nPedaladas) {
-        pedaladasDadas += nPedaladas;
+    public void addSteps(float steps) {
+        takenSteps += steps;
     }
 
     @Override
     public boolean canAttack() {
-        return pedaladasDadas >= pedaladasMinimas;
+        boolean factor1;
+        
+        factor1 = takenSteps >= minimumSteps;
+        return super.canAttack(factor1);
     }
 
     public br.cefetmg.move2play.model.Player getPlayerModel() {
@@ -61,16 +61,17 @@ public abstract class Player extends Character implements Comparable<Player>{
     public float getProgress() {
         float progress;
 
-        progress = (float) pedaladasDadas / pedaladasMinimas; // >=1 -> pode atacar
+        progress = (float) takenSteps / minimumSteps; // >=1 -> pode atacar
         return progress;
     }
 
     public float getPedaladasRestantes() {
-        return pedaladasMinimas - pedaladasDadas;
+        return minimumSteps - takenSteps;
     }
 
     @Override
     public int compareTo(Player t) {
         return Integer.compare(t.score, this.score);
     }
+    
 }

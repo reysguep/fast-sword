@@ -10,26 +10,26 @@ import java.io.File;
  * @author reysguep
  */
 public class MusicManager {
+    
+    private static final String DIRECTORY = "Audios/musics/battle screen";
+    
+    private boolean repeat;
 
-    public MusicManager(String folderName) {
-        musics = new Array<String>();
-        playedMusics = new Array<String>();
+    private final Array<String> playedMusics, musics;
+    
+    public MusicManager() {
+        musics = new Array<>();
+        playedMusics = new Array<>();
 
         repeat = false;
-        this.folderName = folderName;
 
-        File folder = new File(folderName);
+        File folder = Gdx.files.internal(DIRECTORY).file();
         File[] listOfFiles = folder.listFiles();
 
         for (File file : listOfFiles) {
             musics.add(file.getName());
         }
     }
-
-    private final String folderName;
-    private boolean repeat;
-
-    private Array<String> playedMusics, musics;
 
     public Music nextSong() {
         if (musics.size == 0) {
@@ -44,7 +44,7 @@ public class MusicManager {
             musics.removeValue(selectedMusic, true);
         }
         
-        Music music = Gdx.audio.newMusic(Gdx.files.internal(folderName + "/" + selectedMusic));
+        Music music = Gdx.audio.newMusic(Gdx.files.internal(DIRECTORY + "/" + selectedMusic));
         music.setLooping(true);
         return music;
     }

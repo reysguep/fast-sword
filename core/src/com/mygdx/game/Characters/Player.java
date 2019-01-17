@@ -23,32 +23,39 @@ public abstract class Player extends Character implements Comparable<Player> {
         this.playerModel = player;
 
     }
-    
+
     public static br.cefetmg.move2play.model.Player createPlayerModel(String name,
             String uuid) {
         br.cefetmg.move2play.model.Player playerModel;
         playerModel = new br.cefetmg.move2play.model.Player();
-        
+
         playerModel.setUUID(uuid);
         playerModel.setName(name);
         //playerModel.setColor(color);
-        
+
         return playerModel;
     }
 
     @Override
     public void action() {
+        super.action();
         takenSteps -= minimumSteps;
     }
 
-    public void addSteps(float steps) {
-        takenSteps += steps;
+    public void addSteps(int steps) {
+        if (takenSteps + steps > minimumSteps) {
+            takenSteps = minimumSteps;
+        } else if (takenSteps + steps < 0) {
+            takenSteps = 0;
+        } else {
+            takenSteps += steps;
+        }
     }
 
     @Override
     public boolean canAttack() {
         boolean factor1;
-        
+
         factor1 = takenSteps >= minimumSteps;
         return super.canAttack(factor1);
     }
@@ -65,7 +72,7 @@ public abstract class Player extends Character implements Comparable<Player> {
         return progress;
     }
 
-    public float getPedaladasRestantes() {
+    public int getPedaladasRestantes() {
         return minimumSteps - takenSteps;
     }
 
@@ -73,5 +80,5 @@ public abstract class Player extends Character implements Comparable<Player> {
     public int compareTo(Player t) {
         return Integer.compare(t.score, this.score);
     }
-    
+
 }

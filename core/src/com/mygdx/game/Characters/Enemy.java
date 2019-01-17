@@ -33,6 +33,7 @@ public abstract class Enemy extends Character {
 
     @Override
     public void action() {
+        super.action();
         startTime = TimeUtils.millis();
     }
 

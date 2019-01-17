@@ -3,6 +3,7 @@ package com.mygdx.game.managers;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.file.filters.AudioFilter;
 import java.io.File;
 
 /**
@@ -11,11 +12,13 @@ import java.io.File;
  */
 public class MusicManager {
     
+    private static final float VOLUME = 0.7f;
     private static final String DIRECTORY = "Audios/musics/battle screen";
     
     private boolean repeat;
 
     private final Array<String> playedMusics, musics;
+    private Music currentMusic;
     
     public MusicManager() {
         musics = new Array<>();
@@ -24,7 +27,7 @@ public class MusicManager {
         repeat = false;
 
         File folder = Gdx.files.internal(DIRECTORY).file();
-        File[] listOfFiles = folder.listFiles();
+        File[] listOfFiles = folder.listFiles(new AudioFilter());
 
         for (File file : listOfFiles) {
             musics.add(file.getName());
@@ -32,6 +35,10 @@ public class MusicManager {
     }
 
     public Music nextSong() {
+        if(currentMusic != null) {
+            currentMusic.stop();
+        }
+        
         if (musics.size == 0) {
             musics.addAll(playedMusics);
             playedMusics.clear();
@@ -44,9 +51,10 @@ public class MusicManager {
             musics.removeValue(selectedMusic, true);
         }
         
-        Music music = Gdx.audio.newMusic(Gdx.files.internal(DIRECTORY + "/" + selectedMusic));
-        music.setLooping(true);
-        return music;
+        currentMusic = Gdx.audio.newMusic(Gdx.files.internal(DIRECTORY + "/" + selectedMusic));
+        currentMusic.setLooping(true);
+        currentMusic.setVolume(VOLUME);
+        return currentMusic;
     }
 
     public void setRepeat(boolean set) {
@@ -56,5 +64,16 @@ public class MusicManager {
         }
         this.repeat = set;
     }
-
+    
+    public void stop() {
+        currentMusic.stop();
+    }
+    
+    public void pause() {
+        currentMusic.pause();
+    }
+    
+    public void play() {
+        currentMusic.play();
+    }
 }

@@ -19,15 +19,17 @@ import com.mygdx.game.Characters.Enemy;
 import com.mygdx.game.Main;
 import com.mygdx.game.Characters.Player;
 import com.mygdx.game.Team;
-import com.mygdx.game.VisualEffect;
 import libgdxUtils.AnimationCode;
-import libgdxUtils.DrawingCharacter;
+import com.mygdx.game.managers.DrawingManager;
 import com.mygdx.game.accessors.CharacterAccessor;
 import libgdxUtils.ColorsUtil;
 import libgdxUtils.KeyboardUtil;
 import com.mygdx.game.accessors.MusicAccessor;
 import com.mygdx.game.accessors.SpriteAcessor;
+import com.mygdx.game.exceptions.PlayerNotFound;
 import com.mygdx.game.managers.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import libgdxUtils.StateCode;
 import static libgdxUtils.StateCode.*;
 
@@ -39,7 +41,7 @@ public class BattleScreen implements Screen, Move2PlayGame {
 
     public Team teamA, teamB;
     public Array<Character> allCharacters;
-    private DrawingCharacter drawing;
+    private DrawingManager drawing;
     private final Main game;
     private PolygonSpriteBatch batch;
     private SkeletonMeshRenderer renderer;
@@ -51,22 +53,27 @@ public class BattleScreen implements Screen, Move2PlayGame {
     public SoundEffectManager soundEffectManager;
     public VisualEffectManager visualEffectManager;
     public BackgroundManager backgroundManager;
-
     public TweenManager tweenManager;
+
     private Sprite transitionColor;
 
     private int battleState; // 0 = battle; 1 = transition; 2 = ...
 
     private int phase;
 
-    public Array<VisualEffect> hits;
-
     public BattleScreen(Main game, Array<br.cefetmg.move2play.model.Player> waitingPlayers) {
         this.game = game;
-        teamA = new Team('a');
-        teamB = new Team('b');
+        tweenManager = new TweenManager();
+        allCharacters = new Array<>();
+
+        characterManager = new CharacterManager(this, 2);
+        teamA = new Team('a', this);
+        teamB = new Team('b', this);
         for (br.cefetmg.move2play.model.Player playerModel : waitingPlayers) {
             Player player;
+
+            player = characterManager.newPlayer(playerModel);
+            teamA.add(player);
         }
     }
 
@@ -75,20 +82,6 @@ public class BattleScreen implements Screen, Move2PlayGame {
         battleState = 0;
         phase = 1;
 
-        music = musicManager.nextSong();
-        music.play();
-
-        tweenManager = new TweenManager();
-        Tween.setCombinedAttributesLimit(5);
-        Tween.registerAccessor(Character.class, new CharacterAccessor());
-        Tween.registerAccessor(music.getClass(), new MusicAccessor());
-        Tween.registerAccessor(Sprite.class, new SpriteAcessor());
-
-//        System.out.println(Tween.getRegisteredAccessor(music.getClass()));
-        teamB = new Team('b');
-        allCharacters = new Array<>();
-
-        allCharacters.addAll(teamA);
         batch = new PolygonSpriteBatch();
         renderer = new SkeletonMeshRenderer();
         transitionColor = new Sprite(ColorsUtil.BLACK);
@@ -99,13 +92,21 @@ public class BattleScreen implements Screen, Move2PlayGame {
         soundEffectManager = new SoundEffectManager();
         visualEffectManager = new VisualEffectManager();
         musicManager = new MusicManager();
-        characterManager = new CharacterManager(this, 2);
-
         backgroundManager.nextBackground();
-        drawing = new DrawingCharacter(batch, renderer);
+        drawing = new DrawingManager(batch, renderer);
 
         game.eventHandler = this;
         Gdx.input.setInputProcessor(new KeyboardUtil(this));
+
+        music = musicManager.nextSong();
+        music.play();
+
+        Tween.setCombinedAttributesLimit(5);
+        Tween.registerAccessor(Character.class, new CharacterAccessor());
+        Tween.registerAccessor(music.getClass(), new MusicAccessor());
+        Tween.registerAccessor(Sprite.class, new SpriteAcessor());
+
+        characterManager.newRound();
     }
 
     private void nextLevel() {
@@ -124,7 +125,7 @@ public class BattleScreen implements Screen, Move2PlayGame {
                 if (!chr.isDead()) {
                     Tween.to(chr, CharacterAccessor.POS_X, 3.0f).target(chr.getX() + 750).start(tweenManager);
                     chr.setAnimation(AnimationCode.RUNNING, true);
-                    chr.flip(false, false);
+                    chr.flipX(true);
                     if (chr instanceof Player) {
                         Player player = (Player) chr;
                     }
@@ -138,8 +139,9 @@ public class BattleScreen implements Screen, Move2PlayGame {
             if (!tweenManager.containsTarget(transitionColor)) {
                 for (Character chr : teamA) {
                     tweenManager.killTarget(chr);
-                    chr.setPosition(chr.getOrgX(), chr.getOrgY());
-                    chr.setAnimation(AnimationCode.IDLE, true);
+                    chr.setState(StateCode.WAITING);
+                    chr.setHealth(chr.getMaxHealth());
+
                     //chr.health = chr.getMaxHealth();
                     if (chr instanceof Player) {
                         Player player = (Player) chr;
@@ -229,6 +231,7 @@ public class BattleScreen implements Screen, Move2PlayGame {
                 case DYING:
                     if (character.isAnimationFinished()) {
                         if (character instanceof Enemy) {
+                            System.out.println("Animacao do inimigo acabou");
                             allies.removeValue(character, false);
                             removeChrs.add(character);
                         } else if (character instanceof Player) {
@@ -242,6 +245,7 @@ public class BattleScreen implements Screen, Move2PlayGame {
 
                 case REVIVING:
                     if (character.isAnimationFinished()) {
+                        character.setHealth(character.getMaxHealth());
                         character.setState(RETURNING);
                     }
                     break;
@@ -253,19 +257,26 @@ public class BattleScreen implements Screen, Move2PlayGame {
 
     @Override
     public void dispose() {
-        drawing.dispose();
-        batch.dispose();
 
     }
 
     @Override
     public void move(String uuid, int n) {
-        Player player = searchPlayer(uuid);
+        Player player = null;
+
+        try {
+            player = searchPlayer(uuid);
+        } catch (PlayerNotFound ex) {
+            Logger.getLogger(BattleScreen.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         if (player != null) { //Se a referência não for nula
             if (!player.isDead()) { // e o jogador não estiver morto.
                 if (battleState == 0) {
-                    if (player.getPedaladasRestantes() - n <= 0) {
-                        player.addSteps(player.getPedaladasRestantes());
+                    int stepsToAct = player.getPedaladasRestantes();
+
+                    if (stepsToAct == 0) {
+                        player.addHealth(n * 3);
                     } else {
                         player.addSteps(n);
                     }
@@ -276,17 +287,19 @@ public class BattleScreen implements Screen, Move2PlayGame {
         }
     }
 
-    public Player searchPlayer(String str) {
+    public Player searchPlayer(String uuid) throws PlayerNotFound {
+        Player player;
+
         for (Character character : allCharacters) {
             if (character instanceof Player) {
-                Player player = (Player) character;
-                if (player.getPlayerModel().getUUID().equals(str) || player.getName().equals(str)) {
+                player = (Player) character;
+                if (player.getPlayerModel().getUUID().equals(uuid)) {
                     return player;
                 }
             }
         }
 
-        return null;
+        throw new PlayerNotFound(uuid);
     }
 
     @Override
@@ -302,9 +315,7 @@ public class BattleScreen implements Screen, Move2PlayGame {
             drawing.draw(character);
         }
 
-        for (VisualEffect hit : hits) {
-            hit.draw(batch);
-        }
+        visualEffectManager.draw(batch);
 
         transitionColor.draw(batch);
         drawing.drawScores(allCharacters);
@@ -355,6 +366,7 @@ public class BattleScreen implements Screen, Move2PlayGame {
             }
         }
 
+        musicManager.stop();
         game.setScreen(new EndMatchScreen(game, players));
     }
 
@@ -362,33 +374,26 @@ public class BattleScreen implements Screen, Move2PlayGame {
     public void addPlayer(br.cefetmg.move2play.model.Player playerModel) {
         Player player = characterManager.newPlayer(playerModel);
 
-        allCharacters.add(player);
         teamA.add(player);
     }
 
     @Override
-    public void removePlayer(br.cefetmg.move2play.model.Player player) {
-        Player plyr = searchPlayer(player.getUUID());
-        if (plyr != null) {
-            allCharacters.removeValue(plyr, true);
-            if (teamA.contains(plyr, true)) {
-                teamA.removeValue(plyr, true);
+    public void removePlayer(br.cefetmg.move2play.model.Player playerModel) {
+        Player player = null;
+
+        try {
+            player = searchPlayer(playerModel.getUUID());
+        } catch (PlayerNotFound ex) {
+            Logger.getLogger(BattleScreen.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        if (player != null) {
+            allCharacters.removeValue(player, false);
+            if (player.getTeam() == 'a') {
+                teamA.removeValue(player, false);
             } else {
-                teamB.removeValue(plyr, true);
+                teamB.removeValue(player, false);
             }
         }
     }
-
-    public void removePlayer(String name) {
-        Player plyr = searchPlayer(name);
-        if (plyr != null) {
-            allCharacters.removeValue(plyr, true);
-            if (teamA.contains(plyr, true)) {
-                teamA.removeValue(plyr, true);
-            } else {
-                teamB.removeValue(plyr, true);
-            }
-        }
-    }
-
 }

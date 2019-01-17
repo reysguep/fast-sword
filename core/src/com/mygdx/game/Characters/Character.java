@@ -39,15 +39,20 @@ public abstract class Character extends SkeletonAnimation {
     protected final BattleScreen screen;
 
     public Character(String name, CharacterPreset preset, BattleScreen screen) {
-        super(SpineLoader.getClassSkeleton(preset.folder), "idle");
+        super(SpineLoader.getClassSkeleton(preset.folder));
         state = 1;
         this.name = name;
         this.maxHealth = preset.maxHealth;
+        this.health = preset.maxHealth;
         this.strength = preset.strength;
         this.speed = preset.speed;
         this.actionSoundEffect = preset.actionSound;
         this.deathSoundEffect = preset.deathSound;
         this.targetAnimation = preset.hitAnimation;
+        
+        skeleton.getRootBone().setScale(preset.scale);
+        width *= preset.scale;
+        height *= preset.scale;
 
         this.screen = screen;
     }
@@ -55,12 +60,24 @@ public abstract class Character extends SkeletonAnimation {
     public boolean isDead() {
         return health <= 0;
     }
+    
+    public void addHealth(int n) {
+        if(health + n > maxHealth) {
+            health = maxHealth;
+        } else if(health + n < 0) {
+            health = 0;
+        } else {
+            health += n;
+        }
+    }
 
-    public abstract void action();
+    public void action() {
+        screen.soundEffectManager.playSoundEffect(actionSoundEffect);
+    }
 
     public void beAttacked(int damage) {
-        health -= damage;
-        if (health <= 0) {
+        addHealth(damage * -1);
+        if (isDead()) {
             setState(StateCode.DYING);
         }
 
@@ -71,14 +88,16 @@ public abstract class Character extends SkeletonAnimation {
         TweenManager tween;
 
         tween = screen.tweenManager;
-        defaultSide = (team != 'a'); //TURNS TO RIGHT OR LEFT BY DEFAULT
+        defaultSide = (team == 'a'); //TURNS TO RIGHT OR LEFT BY DEFAULT
 
         screen.tweenManager.killTarget(this);
-
+        
+        this.state = state;
         switch (state) {
             case StateCode.WAITING:
                 flipX(defaultSide);
                 setAnimation(AnimationCode.IDLE, true);
+                setPosition(orgX, orgY);
                 break;
 
             case StateCode.GOING:
@@ -101,13 +120,6 @@ public abstract class Character extends SkeletonAnimation {
             case StateCode.DYING:
                 setAnimation(AnimationCode.DYING, false);
                 health = 0;
-
-                if (this instanceof Player) {
-                    Player thisPlayer = (Player) this;
-                    thisPlayer.takenSteps = 0;
-                    thisPlayer.score /= 2;
-                    thisPlayer.timeDied = TimeUtils.millis();
-                }
                 break;
 
             case StateCode.REVIVING:
@@ -117,6 +129,12 @@ public abstract class Character extends SkeletonAnimation {
 
             case StateCode.DEAD:
                 screen.soundEffectManager.playSoundEffect(getActionSoundEffect());
+                if (this instanceof Player) {
+                    Player thisPlayer = (Player) this;
+                    thisPlayer.takenSteps = 0;
+                    thisPlayer.score /= 2;
+                    thisPlayer.timeDied = TimeUtils.millis();
+                }
                 break;
 
             default: {
@@ -128,7 +146,7 @@ public abstract class Character extends SkeletonAnimation {
             }
         } //end switch
 
-        this.state = state;
+        
     } //end method
 
     public abstract boolean canAttack();
@@ -242,4 +260,22 @@ public abstract class Character extends SkeletonAnimation {
     public void setTeam(char team) {
         this.team = team;
     }
+
+    public void setHealth(int health) {
+        this.health = health;
+    }
+
+    public void setMaxHealth(int maxHealth) {
+        this.maxHealth = maxHealth;
+    }
+
+    public void setStrength(int strength) {
+        this.strength = strength;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
+    
+    
 }

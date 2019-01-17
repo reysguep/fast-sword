@@ -15,20 +15,15 @@ import java.util.HashMap;
 public class SpineLoader {
     private static final String CHARACTERS_FOLDER = "Animations/spine/";
     private static HashMap<String, SkeletonData> skeletonMap;
-     
-    public static void start() {
-        skeletonMap = loadCharacters();
-    }
     
     public static SkeletonData getClassSkeleton(String className) {
         return skeletonMap.get(className);
     }
     
-    private static HashMap<String, SkeletonData> loadCharacters() {
-        HashMap<String, SkeletonData> newMap;
+    public static void load() {
         Array<File> charactersFolders;
         
-        newMap = new HashMap<>();
+        skeletonMap = new HashMap<>();
         charactersFolders = findCharactersFolders();
         
         for(File folder : charactersFolders) {
@@ -38,10 +33,8 @@ public class SpineLoader {
             data = createSkeletonData(folder);
             className = folder.getName();
             
-            newMap.put(className, data);
+            skeletonMap.put(className, data);
         }
-        
-        return newMap;
     }
     
     private static Array<File> findCharactersFolders() {

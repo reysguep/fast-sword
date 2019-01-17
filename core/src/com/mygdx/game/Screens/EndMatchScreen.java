@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Main;
 import com.mygdx.game.Characters.Player;
+import libgdxUtils.KeyboardUtil;
 
 /**
  *
@@ -36,6 +37,8 @@ public class EndMatchScreen implements Screen, Move2PlayGame{
     
     @Override
     public void show() {
+        game.eventHandler = this;
+        
         players.sort();
         
         layout = new GlyphLayout();
@@ -55,6 +58,11 @@ public class EndMatchScreen implements Screen, Move2PlayGame{
         parameterP.size = 45;
         parameterP.borderWidth = 3;
         playerMessage = generatorP.generateFont(parameterP);
+        
+        Gdx.input.setInputProcessor(new KeyboardUtil(this));
+        
+        music.setLooping(true);
+        music.play();
     }
 
     @Override
@@ -107,6 +115,7 @@ public class EndMatchScreen implements Screen, Move2PlayGame{
 
     @Override
     public void initGame() {
+        music.stop();
         game.setScreen(new WaitingScreen(game));
     }
 

@@ -19,12 +19,12 @@ import com.esotericsoftware.spine.SkeletonMeshRenderer;
 public class SkeletonAnimation {
 
     public final Skeleton skeleton;
-    private final AnimationState state;
-    private TrackEntry track;
-    private float width, height;
+    protected final AnimationState state;
+    protected TrackEntry track;
+    protected float width, height;
 
-    boolean isReversed;
-    String currentAnimation;
+    private boolean isReversed;
+    protected String currentAnimation;
 
     public SkeletonAnimation(SkeletonData data) {
         skeleton = new Skeleton(data);

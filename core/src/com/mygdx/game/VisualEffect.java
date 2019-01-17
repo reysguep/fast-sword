@@ -30,8 +30,8 @@ public class VisualEffect {
     public void draw(Batch batch) {
         if (!animation.isAnimationFinished()) {
             int x, y;
-            x = (int) (target.getX() + (target.getWidth() / 2) - (animation.getWidth() / 2));
-            y = (int) (target.getY() + (target.getHeight() / 2) - (animation.getHeight() / 2));
+            x = (int) (target.getX() - (animation.getWidth() / 2));
+            y = (int) (target.getY() - (animation.getHeight() / 2));
             animation.setPosition(x, y);
             animation.draw(batch);
 

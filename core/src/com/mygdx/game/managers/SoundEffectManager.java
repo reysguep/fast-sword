@@ -18,7 +18,7 @@ public class SoundEffectManager {
     private final HashMap<String, Integer> counter;
 
     public SoundEffectManager() {
-        soundEffetcs = SoundEffectLoader.loadSoundEffects();
+        soundEffetcs = SoundEffectLoader.soundEffects;
         counter = new HashMap<>();
         
         for (SoundEffect soundEffect : soundEffetcs) {

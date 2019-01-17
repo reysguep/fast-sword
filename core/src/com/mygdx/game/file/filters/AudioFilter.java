@@ -2,6 +2,7 @@ package com.mygdx.game.file.filters;
 
 import java.io.File;
 import java.io.FileFilter;
+import libgdxUtils.FileUtils;
 
 /**
  *
@@ -14,9 +15,11 @@ public class AudioFilter implements FileFilter {
         String fileName, extension;
         String[] splitedName;
 
-        fileName = file.getName();
-        splitedName = fileName.split(".");
-        extension = splitedName[splitedName.length - 1];
+        if(file.isDirectory()) {
+            return false;
+        }
+        
+        extension = FileUtils.getFileExtension(file);
 
         switch (extension) {
             case "wav":

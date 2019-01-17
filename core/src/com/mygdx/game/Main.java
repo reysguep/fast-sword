@@ -9,6 +9,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.Screens.LoadingScreen;
 
 public class Main extends Game implements Move2PlayGame, ApplicationListener {
 
@@ -38,7 +39,7 @@ public class Main extends Game implements Move2PlayGame, ApplicationListener {
     
     @Override
     public void create() {
-        setScreen(new SplashScreen(this));
+        setScreen(new LoadingScreen(this));
          
     }
     

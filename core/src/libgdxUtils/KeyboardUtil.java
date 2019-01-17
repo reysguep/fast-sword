@@ -6,10 +6,12 @@ import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.Graphics.Monitor;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
+import com.mygdx.game.Characters.Player;
 import com.mygdx.game.Main;
 import com.mygdx.game.Screens.BattleScreen;
 import com.mygdx.game.Screens.EndMatchScreen;
 import com.mygdx.game.Screens.WaitingScreen;
+import com.mygdx.game.Characters.Character;
 
 /**
  *
@@ -45,19 +47,18 @@ public class KeyboardUtil implements InputProcessor {
             WaitingScreen screen = (WaitingScreen) screenM;
             switch (keycode) {
                 case Keys.U:
-                    screen.addPlayer(Main.createPlayer(0, "Lancelot"));
+                    screen.addPlayer(Player.createPlayerModel("Lancelot", "0000"));
                     break;
                 case Keys.I:
-                    screen.addPlayer(Main.createPlayer(1, "Elliot"));
+                    screen.addPlayer(Player.createPlayerModel("Elliot", "1111"));
                     break;
                 case Keys.O:
-                    screen.addPlayer(Main.createPlayer(2, "Noah"));
+                    screen.addPlayer(Player.createPlayerModel("Noah", "2222"));
                     break;
                 case Keys.P:
-                    screen.addPlayer(Main.createPlayer(3, "General"));
+                    screen.addPlayer(Player.createPlayerModel("Eliza", "3333"));
                     break;
                 case Keys.K:
-                    //screen.removePlayer("Lancelot");
                     break;
                 case Keys.L:
                     //screen.removePlayer("Elliot");
@@ -70,27 +71,28 @@ public class KeyboardUtil implements InputProcessor {
             }
         } else if (screenM instanceof BattleScreen) {
             BattleScreen screen = (BattleScreen) screenM;
+            Character c;
             switch (keycode) {
                 case Keys.U:
-                    screen.move("Lancelot", 1);
+                    screen.move("0000", 1);
                     break;
+                    
                 case Keys.I:
-                    screen.move("Elliot", 1);
+                    screen.move("1111", 1);
                     break;
+                    
                 case Keys.O:
-                    screen.move("Noah", 1);
+                    screen.move("2222", 1);
                     break;
+                    
                 case Keys.P:
-                    screen.move("General", 1);
+                    screen.move("3333", 1);
                     break;
-                case Keys.K:
-                    screen.removePlayer("Lancelot");
-                    break;
-                case Keys.L:
-                    screen.removePlayer("Elliot");
-                    break;
-                case Keys.BACKSPACE:
+                    
+                case Keys.ENTER:
                     screen.finishMatch();
+                    break;
+                    
                 default:
                     break;
             }

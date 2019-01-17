@@ -26,12 +26,13 @@ public class BadViking extends Enemy{
         preset.actionSound = "hit1";
         preset.deathSound = "death1";
         preset.hitAnimation = "slash";
-        preset.folder = "player/viking/";
+        preset.folder = "viking";
         preset.maxHealth = 300;
         preset.strength = 70;
-        preset.scale = 1.0f;
+        preset.scale = 0.6f;
         preset.speed = 75;
         preset.timeToAttack = 8;
+        preset.name = "Bad Viking";
         
         return preset;
     }
@@ -40,8 +41,11 @@ public class BadViking extends Enemy{
     public void action() {
         super.action();
         Array<Character> targets;
-        
+
         targets = TargetSelection.allEnemies(this, screen);
+        for (int i = 0; i < targets.size; i++) {
+            screen.visualEffectManager.addEffect(this, targets.get(i));
+        }
         CharacterActions.normalAttack(this, targets);
     }
 }

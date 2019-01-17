@@ -15,10 +15,10 @@ import java.io.File;
 public class SoundEffectLoader {
 
     private static final String DEFAULT_PATH = "Audios/sounds/";
-
-    public static Array<SoundEffect> loadSoundEffects() {
+    public static Array<SoundEffect> soundEffects;
+    
+    public static void load() {
         File[] soundEffectFolders;
-        Array<SoundEffect> soundEffects;
         
         soundEffects = new Array<>();
         soundEffectFolders = findSoundEffectFolders();
@@ -30,8 +30,6 @@ public class SoundEffectLoader {
             soundEffect = new SoundEffect(folder.getName(), sounds);
             soundEffects.add(soundEffect);
         }
-        
-        return soundEffects;
     }
     
     private static File[] findSoundEffectFolders() {

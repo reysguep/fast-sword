@@ -1,4 +1,4 @@
-package libgdxUtils;
+package com.mygdx.game.managers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -12,13 +12,14 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.esotericsoftware.spine.SkeletonMeshRenderer;
 import com.mygdx.game.Characters.Character;
 import com.mygdx.game.Characters.Player;
+import libgdxUtils.ColorsUtil;
 import static libgdxUtils.StateCode.*;
 
 /**
  *
  * @author reysguep
  */
-public class DrawingCharacter {
+public class DrawingManager {
 
     private final PolygonSpriteBatch batch;
     private final SkeletonMeshRenderer renderer;
@@ -33,7 +34,7 @@ public class DrawingCharacter {
 
     GlyphLayout layout = new GlyphLayout();
 
-    public DrawingCharacter(PolygonSpriteBatch batch, SkeletonMeshRenderer renderer) {
+    public DrawingManager(PolygonSpriteBatch batch, SkeletonMeshRenderer renderer) {
         this.batch = batch;
         this.renderer = renderer;
 
@@ -67,16 +68,16 @@ public class DrawingCharacter {
     private void drawBars(Character character) {
         float x, y, width;
 
-        x = character.getX() + (character.getWidth() / 2) - 50;
+        x = character.getX() - 50;
         y = character.getY() + character.getHeight();
 
-        width = (int) (100.0f * character.getProgress());
+        width = 100.0f * character.getProgress();
 
         batch.draw(ColorsUtil.BLUE, x, y, width, 10);
 
-        width = (character.getHealth() * 100) / character.getMaxHealth();
+        width = 100f * character.getHealth() / character.getMaxHealth();
 
-        y += 15;
+        y += 10;
         batch.draw(ColorsUtil.RED, x, y, 100, 10);
         batch.draw(ColorsUtil.GREEN, x, y, width, 10);
     }
@@ -90,16 +91,16 @@ public class DrawingCharacter {
         layout.setText(fontName, text);
         textWidth = layout.width;
 
-        x = character.getX() + (character.getWidth() / 2) - (textWidth / 2);
-        y = character.skeleton.findBone("head").getY() + 45;
+        x = character.getX() - (textWidth / 2);
+        y = character.getY() + character.getHeight() + 45;
 
-        fontName.draw(batch, text, 0.1f, y);
+        fontName.draw(batch, text, x, y);
     }
 
     private void drawReviveBar(Player player) {
         float x, y;
         
-        x = player.getX() + (player.getWidth() / 2) - 50;
+        x = player.getX() - 50;
         y = player.getY() + player.getHeight();
         
         long timeSince = TimeUtils.millis() - player.timeDied;

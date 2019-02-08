@@ -1,5 +1,0 @@
-healing;8;0.1
-shoot;8;0.1
-slash;8;0.1
-smash;8;0.1
-splash;8;0.1

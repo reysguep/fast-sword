@@ -20,8 +20,8 @@ allprojects {
     version = '1.0'
     ext {
         appName = "GDX"
-        gdxVersion = '1.9.6'
-        roboVMVersion = '2.3.1'
+        gdxVersion = '1.9.9'
+        roboVMVersion = '2.3.5'
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
         aiVersion = '1.8.0'
@@ -58,6 +58,9 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
         
         compile "org.mini2Dx:universal-tween-engine:6.3.3"
+        
+        compile "com.esotericsoftware.spine:spine-libgdx:3.5.51.1"
+        
         compile fileTree(dir: 'assets/libs', include: '*.jar')
     }
 }

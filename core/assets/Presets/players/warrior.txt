@@ -1,6 +1,7 @@
 warrior;hit1;death1;slash
 attack random enemy;nothing
-17
-100;200
-300
-70
+17;		pedaladas mínimas
+100;200;	largura/altura
+300;		vida
+70;		força
+75;		velocidade

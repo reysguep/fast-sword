@@ -2,10 +2,14 @@ package com.mygdx.game;
 
 import com.mygdx.game.Screens.SplashScreen;
 import br.cefetmg.move2play.game.Move2PlayGame;
+import br.cefetmg.move2play.model.Player;
 import br.cefetmg.move2play.settings.GameSettings;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.Screens.LoadingScreen;
 
 public class Main extends Game implements Move2PlayGame, ApplicationListener {
 
@@ -18,7 +22,7 @@ public class Main extends Game implements Move2PlayGame, ApplicationListener {
     public Move2PlayGame eventHandler;
     private final GameSettings gs;
     private Screen previousScreen = null;
-    
+    public AssetManager assetManager;
     
     //private Assets resources;
     
@@ -26,6 +30,7 @@ public class Main extends Game implements Move2PlayGame, ApplicationListener {
         eventHandler = this;
         gs = new GameSettings(Main.class);
         //gs.loadSettings();
+        assetManager = new AssetManager();
     }
     
     public void changeScreen() {
@@ -34,8 +39,7 @@ public class Main extends Game implements Move2PlayGame, ApplicationListener {
     
     @Override
     public void create() {
-        Assets manager = new Assets();
-        setScreen(new SplashScreen(this));
+        setScreen(new LoadingScreen(this));
          
     }
     
@@ -134,6 +138,17 @@ public class Main extends Game implements Move2PlayGame, ApplicationListener {
             eventHandler.move(uuid,i);
         else
             System.out.println("Move from Main");
+    }
+    
+    public static Player createPlayer(int index, String name){
+        Player player;
+        player = new Player();
+        
+        player.setName(name);
+        player.setUUID("test00" + index);
+        //player.setColor(color);
+        
+        return player;
     }
 }
 

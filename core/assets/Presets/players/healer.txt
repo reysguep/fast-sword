@@ -1,6 +1,7 @@
 healer;hit3;death1;healing
 heal lowest_health ally;heal all ally
-14
-100;200
-250
-70
+14;		pedaladas mínimas
+100;200;	largura/altura
+250;		vida
+70;		força
+100;		velocidade

@@ -188,7 +188,7 @@ public class BattleScreen implements Screen, Move2PlayGame {
                         Player player = (Player) character;
                         long timeRemaining;
 
-                        timeRemaining = 6000 - (TimeUtils.millis() - player.timeDied);
+                        timeRemaining = 15000 - (TimeUtils.millis() - player.timeDied);
                         player.setAlpha(0.5f + 0.5f * (((6000 - (float) timeRemaining)) / 6000));
 
                         if (timeRemaining <= 0) {
